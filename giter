@@ -1,0 +1,48 @@
+#!/bin/bash
+
+org=$(echo ${1} | awk -F "/" '{print $1}')
+repo=$(echo ${1} | awk -F "/" '{print $2}')
+tmpdir=${tmpbasedir:-/tmp}/git$$
+outpath=${outpath:-/var/www/dwnld}
+
+umask 022
+trap "{ rm -rf ${tmpdir}; exit 0; }" EXIT
+[ "$(dpkg -l | awk '{print $2}' | grep -c "^rar$\|^git$\|^jq$")" -lt 3 ] && apt-get --yes install git rar jq
+[ ! -d "${tmpdir}/${org}" ] && mkdir -p ${tmpdir}/${org}
+[ ! -d "${outpath}" ] && mkdir -p ${outpath}
+
+
+[ -n "${repo}" ] && outfile=${org}_${repo} || outfile=${org}
+
+ls ${outpath}/${outfile}*.rar &>/dev/null
+if [ "$?" != 0 ]; then
+  cd ${tmpdir}/${org}
+  if [ -z "${repo}" ]; then
+    count_repo=$(curl -s https://api.github.com/users/${org} | jq -r '.public_repos')
+    echo Get ${outfile} [ ${count_repo} repos ]
+    count_repo_list=$(( $(curl -s https://api.github.com/users/${org} | jq -r '.public_repos') / 100 + 1))
+    for p in $(seq 1 ${count_repo_list}); do
+      for i in $(curl -s "https://api.github.com/users/${org}/repos?page=${p}&per_page=100" | jq -r '.[] | .git_url' | sed 's/git:\/\//http:\/\//g'); do
+        count_actual=$(( count_actual + 1 ))
+        echo -n "${org} cloned ${count_actual}/${count_repo} - $(echo ${i} | sed 's/^.*\///g;s/\.git//g').. "
+        [ ! -d "${i}.git" ] && git clone --bare --shared ${i} >/dev/null 2>&1
+        [ "$?" = 0 ] && echo ok || echo fail
+      done
+    done
+  else
+    echo Get $(echo ${outfile} | sed 's/_/\//g')
+    [ ! -d "${org}_${repo}.git" ] && git clone --bare --shared https://github.com/${1}.git >/dev/null 2>&1
+  fi
+
+
+  echo -n "Compression ${outfile}.. "
+  rar a -m3 -r -v10000000 ${outpath}/${outfile}.rar ${tmpdir}/${org} >/dev/null 2>&1
+  [ "$?" = 0 ] && echo ok || echo fail
+  [[ "${outpath}" == /var/www/* ]] && chown -R www-data:www-data ${outpath}
+  rm -rf ${tmpdir}
+
+  ls -lha ${outpath}/${outfile}*
+else
+  echo Skip clone in ${outpath}/${outfile}*.rar
+fi
+

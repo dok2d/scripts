@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+nginx -t 2>1 &>/dev/null
+access_logs=$(nginx -T 2>/dev/null | awk '/access_log/ {print $2}' | sed 's/;//g')
+
+> /tmp/nginx_allow
+> /tmp/nginx_deny
+
+for log in ${access_logs}; do
+  log_arch=$(ls ${log}* | grep ".gz$" || :)
+  log_notarch=$(ls ${log}* | grep -v ".gz$")
+
+  [ -n "${log_arch}" ] && zgrep -h " 200 " ${log_arch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_allow
+  grep -h " 200 " ${log_notarch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_allow
+
+  [ -n "${log_arch}" ] && zgrep -hv " 200 " ${log_arch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_deny
+  grep -hv " 200 " ${log_notarch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_deny
+done
+
+for i in $(cat /tmp/nginx_allow); do
+  sed -i "/${i}/d" /tmp/nginx_deny
+done
+
+sed -i 's/^/deny /g;s/$/;/g' /tmp/nginx_deny
+[ -f /etc/nginx/deny ] && cp /etc/nginx/deny /tmp/nginx_deny_orig
+sort -u /tmp/nginx_deny* > /etc/nginx/deny
+
+nginx -t 2>1 &>/dev/null
+[ "$?" = 0 ] && nginx -s reload

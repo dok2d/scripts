@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source=$(echo ${1} | sed 's/\/$//g')
+
+for i in $(curl -s ${1} | grep href | grep -v "/\"" | sed 's/.*href=\"//g;s/\".*//g'); do
+  echo ${source}/${i}
+done > links
+bash geter
