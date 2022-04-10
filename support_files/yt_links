@@ -1,0 +1,79 @@
+### youtube-dl --no-call-home --continue --playlist-reverse --ignore-errors --no-check-certificate --no-playlist -f bestvideo+bestaudio --format mp4 --batch-file yt_links --output /var/www/dwnld/yt/%(channel)s/%(title)s.%(ext)s
+
+# Документальное
+
+## Намедни
+https://www.youtube.com/watch?v=FQzVrnDD1jI&list=PLWC_P718eyWOOs9YkffJ8eAeJIh_g0Ou4 #04-10
+https://www.youtube.com/watch?v=yn3XdmOYMtg&list=PLWC_P718eyWPWodDN225v3-XCsxomKbBT #11-15
+https://www.youtube.com/watch?v=XSIAzqIvrIM&list=PLWC_P718eyWOFNRSoLqH6XHtdGCoYpqit #16-20
+https://www.youtube.com/watch?v=nns3hy3xHko&list=PLWC_P718eyWP5CwQpHA2Rl8leobXpvcN8 #1921-25
+https://www.youtube.com/watch?v=3ZxmatGemzo&list=PLWC_P718eyWOu2uU6Z_cmkVTKVXBxB4eo #1926-30 (без 29-30)
+https://www.youtube.com/watch?v=UF8LcVm6RPY #1929
+https://www.youtube.com/watch?v=ulgyYYgD2jU #1930
+https://www.youtube.com/watch?v=ZY3lhQWkq14&list=PLWC_P718eyWNTk3MOUMXOWJPjmNM07tyZ #1952-60
+https://www.youtube.com/watch?v=kSuy6TAHVG4&list=PLWC_P718eyWMDKgx42VkUu7C5QOJiQvgl #1946-51
+
+## Редакция
+https://www.youtube.com/playlist?list=PLguYHBi01DWpt049DdtC4PAD748BskRKX #Редакция. Полный формат
+
+# Образовательное
+
+## Хохлов Сабатовский
+https://www.youtube.com/playlist?list=PLX9plZEau9JzoVeu-Bsf33hhVHdmqRFCL #Уроки DaVinci Resolve
+https://www.youtube.com/playlist?list=PLX9plZEau9JxPNI7o07oeHcQBF-M_bgBo #Видеомонтаж для новичков
+https://www.youtube.com/playlist?list=PLX9plZEau9Jyxgw4iR9QY7id_bLUqsSQx #Мобильная съёмка
+https://www.youtube.com/playlist?list=PLX9plZEau9JzH5Cncy7zRi-x51LEdwtlQ #Съёмка Видео
+https://www.youtube.com/playlist?list=PLX9plZEau9Jz76m86chfyLOKK2CXzU9aK #Свет для Видео
+https://www.youtube.com/playlist?list=PLX9plZEau9JwL2-a6V33HYiTeX_ekWfgS #Интервью и документалки
+
+## Другие
+https://www.youtube.com/c/AlexGyverShow
+https://www.youtube.com/c/SergeyGavruk #Golang
+https://www.youtube.com/c/IvanAvdeev
+https://www.youtube.com/c/DavidMahler
+https://www.youtube.com/user/slylama
+https://www.youtube.com/playlist?list=PL5htYdrGMzXN5klqFErjPhiVZOWLqQto #Гитарист ТВ. Для начинающих
+https://www.youtube.com/playlist?list=PLjgai-5_Ef9rjfUW-cR_xj3GhIKhaSO3m #JamieFenn - 🔥 THE BEST DAVINCI RESOLVE EFFECTS 🔥
+
+# Развлекательное
+https://www.youtube.com/user/TheBadComedian
+https://www.youtube.com/c/YuriTheProfessional
+https://www.youtube.com/watch?v=jvhCjqJ2lak #Разум Фримана. Все серии без заставок (HD) RUS
+https://www.youtube.com/user/0420to #TO420
+https://www.youtube.com/c/MasyanyaKuvaeva
+
+## Потупить
+https://www.youtube.com/c/aocore #Лёша Корепанов - о том, как быть айтишником
+https://www.youtube.com/playlist?list=PLEaW6Stj8WijieAtCJF_yhBdmxxZEb3bc #Ролики, где старался Кунгуров
+https://www.youtube.com/watch?v=n0Cgu-rsP4U&list=PLhI-JQSdkYDVSXHLuLJEX4lziE9zHf0Uj #ЧБУ - [Анализ и эссе]
+https://www.youtube.com/c/vdud
+https://www.youtube.com/c/SciOne
+
+## Музыка
+https://www.youtube.com/watch?v=C5kluAgG6qE #NPP
+https://www.youtube.com/watch?v=XYHLeZ8rmAg #Amon Tobin - Foley Room Live In Brussels [Full DJ Set]
+https://www.youtube.com/watch?v=wptkkVKCse0 #Amon Tobin - 4 Deck Set, Recorded in Seattle 2009
+https://www.youtube.com/watch?v=NWjWikIukWY #Progressive Psytrance mix Aug 2018 [ Boom festival 2018 edition]
+https://www.youtube.com/watch?v=1qzSagjh1ck #Russian hardbass mix 4h
+https://www.youtube.com/watch?v=Weprhcg78bY #НАУТИЛУС ПОМПИЛИУС ✪ ВСЕ ХИТЫ ✪ ЛУЧШИЕ ПЕСНИ РУССКОГО РОКА ✪
+https://www.youtube.com/watch?v=UcX88y4WQ4c #✮ R̲a̲mms̲te̲in ✮ Discography - 1995 - 2009 ✮
+https://www.youtube.com/watch?v=UPd76O6M4do #R A M M S T E I N Greatest Hits Full Album - Best Songs Of R A M M S T E I N Playlist 2021
+https://www.youtube.com/watch?v=DY1s9SmrQRE #Carpenter Brut - Trilogy
+https://www.youtube.com/watch?v=6_t_ZXavIOo&list=PL9e7gmwejeGpNRxXByZKvm1cfdEdXG9-s #Carpenter Brut - Official Videos
+https://www.youtube.com/watch?v=3qsUvCmA7PI #3 hours of Prophecy Theme from DUNE (1984) Soundtrack, Relaxing Sleep Sound
+https://www.youtube.com/watch?v=Zb6xEl4IMgQ #Сборник песен ssshhhiiittt!
+https://www.youtube.com/channel/UClld-el6JSE_GvbhTnBEFUA #Speck of Dust
+https://www.youtube.com/watch?v=KxIvINLhfwY #Psychedelic Trance mix February2018 [Cuphead/Mugman edition]
+https://www.youtube.com/watch?v=ZH6JUqPX8iE #Cyberpunk 2077 (OST) Full / Complete Official Soundtrack - Original Game Soundtrack [FULL ALBUM]
+https://www.youtube.com/watch?v=VWziHqEd0Uw #Diablo 2 - Complete Soundtrack HD
+https://www.youtube.com/watch?v=iFOfSlDCwYw #Diablo Theme Tristram Music 10 HOURS
+https://www.youtube.com/watch?v=P3ZrN-m7VJA #Diablo 2 Soundtrack (Full)
+https://www.youtube.com/watch?v=geajCOmYRcw #Psychedelic Trance mix November 2017 [video game : Cuphead / Trippy Cartoon]
+https://www.youtube.com/watch?v=JPfVwOd6jDc #Russian Post-Punk Collection Vol2
+
+# Совсем другое
+https://www.youtube.com/watch?v=G6BMEtsF4WA #Ведьмак 3. Гюнтер о'Дим даёт советы Геральту по общению с Цири.
+https://www.youtube.com/watch?v=DfA2BKPOhCA #Оптимизируем игру до 2 КИЛОБАЙТ
+https://www.youtube.com/watch?v=nsgQcRxf3e0 #SOMA: Transmission - весь фильм на русском языке
+
+
