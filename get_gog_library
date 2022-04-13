@@ -1,0 +1,62 @@
+#!/bin/bash
+
+set -e
+
+[ -f gog_cook ] && cook=$(cat gog_cook) || (echo "NULL COOKIE!" && exit 1)
+
+#os="lin win mac" #for get all types of installation
+#lang="eng rus" # If English lang isn't available - get russian
+platforms="lin win"
+langs_priority="rus eng"
+outpath=${outpath:-/var/www/}
+
+
+getpage() {
+  [ -z "${1}" ] && (echo "NULL URL" && break)
+  curl -s -H "${cook}" "$(for i in $*; do echo -n "${i} "; done)"
+}
+
+totalpages="$(getpage "https://www.gog.com/account/getFilteredProducts?hiddenFlag=0&mediaType=1" | jq -r '.totalPages')"
+
+for i in $(seq 1 ${totalpages}); do  
+  inventory="${inventory}$([ -n "${inventory}" ] && echo -e "\n")$(getpage "https://www.gog.com/account/getFilteredProducts?hiddenFlag=0&mediaType=1&page=${i}&sortBy=date_purchased" | jq -r '.products[] | "\(.id) \(.worksOn) \(.slug) \(.title)"')"
+done
+
+echo -e "${inventory}" | while read id platform slug name; do
+  unset lang_selected
+  gameinfo="$(getpage "https://www.gog.com/account/gameDetails/${id}.json")"
+  cdkey=$(echo ${gameinfo} | jq -r '.cdKey')
+  langs_available=$(echo ${gameinfo} | jq -r '.downloads[] | .[0]')
+
+  for lang in ${langs_priority,,}; do
+    [ "${lang:0:3}" = rus ] && lang=русский
+    [ "${lang:0:3}" = eng ] && lang=English
+    [[ "${langs_available}" == *"${lang}"* ]] && lang_selected=${lang}
+    [[ "${langs_available}" == *"${lang}"* ]] && break
+  done
+  if [ -n "${lang_selected}" ]; then
+    files_links=$(echo ${gameinfo} | jq -r '.downloads[] | select(.[0]=="'${lang_selected}'") | .[1] | .windows[] | .manualUrl' | grep installer[0-9])
+    files_count=$(echo -e "${files_links}" | wc -l)
+
+    for os in ${platforms,,}; do
+      unset os_type
+      [ "${os:0:1}" = l ] && os_type=Linux
+      [ "${os:0:1}" = w ] && os_type=Windows
+      [ "${os:0:1}" = m ] && os_type=Mac
+      if [ "$(echo ${platform} | sed 's/:/: "/g;s/,/", /g;s/}/"}/g' | jq -r .${os_type})" = true ]; then
+        [ "${files_count}" -eq 1 ] && outdir=${outpath}/GOG/${os} || outdir=${outpath}/GOG/${os}/${slug}
+        [ -d "${outdir}" ] && mkdir -p ${outdir}
+        [ -n "${cdkey}" ] && echo ${cdkey} > ${outdir}/${slug}.cdkey
+        unset count_download
+        for i in ${files_links}; do
+          count_download=$((count_download+1))
+          echo -n "${name} [${os}] (${count_download}/${files_count}).. "
+          target_link=$(curl -sILH "${cook}" --write-out '%{url_effective}' --output /dev/null https://www.gog.com${i})
+          outfile_name=$(echo ${target_link} | sed 's/.*\///;s/%[0-9][0-9]//g;s/setup_//g;s/gog_//g;s///g;s/\.exe.*/.exe/g;s/\.bin.*/.bin/g')
+          wget ${target_link} -qcO ${outdir}/${outfile_name}
+          echo ok
+        done
+      fi
+    done
+  fi
+done
