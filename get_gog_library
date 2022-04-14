@@ -18,7 +18,7 @@ getpage() {
 
 totalpages="$(getpage "https://www.gog.com/account/getFilteredProducts?hiddenFlag=0&mediaType=1" | jq -r '.totalPages')"
 
-for i in $(seq 1 ${totalpages}); do  
+for i in $(seq 1 ${totalpages}); do
   inventory="${inventory}$([ -n "${inventory}" ] && echo -e "\n")$(getpage "https://www.gog.com/account/getFilteredProducts?hiddenFlag=0&mediaType=1&page=${i}&sortBy=date_purchased" | jq -r '.products[] | "\(.id) \(.worksOn) \(.slug) \(.title)"')"
 done
 
@@ -35,8 +35,6 @@ echo -e "${inventory}" | while read id platform slug name; do
     [[ "${langs_available}" == *"${lang}"* ]] && break
   done
   if [ -n "${lang_selected}" ]; then
-    files_links=$(echo ${gameinfo} | jq -r '.downloads[] | select(.[0]=="'${lang_selected}'") | .[1] | .windows[] | .manualUrl' | grep installer[0-9])
-    files_count=$(echo -e "${files_links}" | wc -l)
 
     for os in ${platforms,,}; do
       unset os_type
@@ -44,8 +42,10 @@ echo -e "${inventory}" | while read id platform slug name; do
       [ "${os:0:1}" = w ] && os_type=Windows
       [ "${os:0:1}" = m ] && os_type=Mac
       if [ "$(echo ${platform} | sed 's/:/: "/g;s/,/", /g;s/}/"}/g' | jq -r .${os_type})" = true ]; then
+        files_links=$(echo ${gameinfo} | jq -r '.downloads[] | select(.[0]=="'${lang_selected}'") | .[1] | .'${os_type,,}'[] | .manualUrl' | grep installer[0-9])
+        files_count=$(echo -e "${files_links}" | wc -l)
         [ "${files_count}" -eq 1 ] && outdir=${outpath}/GOG/${os} || outdir=${outpath}/GOG/${os}/${slug}
-        [ -d "${outdir}" ] && mkdir -p ${outdir}
+        mkdir -p ${outdir}
         [ -n "${cdkey}" ] && echo ${cdkey} > ${outdir}/${slug}.cdkey
         unset count_download
         for i in ${files_links}; do
@@ -60,3 +60,4 @@ echo -e "${inventory}" | while read id platform slug name; do
     done
   fi
 done
+
