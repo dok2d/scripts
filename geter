@@ -1,7 +1,7 @@
 #!/bin/bash
 
 for url in $(cat links); do
-  filename=$(echo ${url} | sed 's/.*\///;s/%[0-9][0-9]//g;s/setup_//g;s/gog_//g')
+  filename=$(echo ${url} | sed 's/.*\///;s/%[0-9][0-9]//g')
   #trap "{ rm ${filename}.tmp; exit 0; }" EXIT
   echo -n "${filename}.. "
   [ "$(echo ${filename} | sed 's/^.*\.//g')" = exe -o "$(echo ${filename} | sed 's/^.*\.//g')" = bin ] && filename=win/${filename}
