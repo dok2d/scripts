@@ -11,6 +11,7 @@ biometrics
 BlackArch
 bluez
 ceph
+clickhouse
 chromium
 coreos
 CRYTEK
@@ -63,6 +64,7 @@ microsoft
 MidnightCommander
 mindmup
 mininet
+miranda-ng 
 mirror
 mixxxdj
 mozilla
@@ -120,5 +122,7 @@ xiph
 xmppjs
 yaml
 yandex
+ydb-platform
 youtube
 zabbix
+w23
