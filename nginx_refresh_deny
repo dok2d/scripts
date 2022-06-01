@@ -3,7 +3,7 @@
 set -e
 
 nginx -t 2>1 &>/dev/null
-access_logs=$(nginx -T 2>/dev/null | awk '/access_log/ {print $2}' | sed 's/;//g')
+access_logs=$(nginx -T 2>/dev/null | awk '/access_log/ {print $2}' | sed 's/;//g' | grep -v ^off$)
 
 > /tmp/nginx_allow
 > /tmp/nginx_deny
@@ -19,7 +19,7 @@ for log in ${access_logs}; do
   grep -hv " 200 " ${log_notarch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_deny
 done
 
-for i in $(cat /tmp/nginx_allow); do
+for i in $(cat /tmp/nginx_allow) "^192\.168\." "^10\." "^172\."{16..31}"\."; do
   sed -i "/${i}/d" /tmp/nginx_deny
 done
 
