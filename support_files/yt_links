@@ -1,4 +1,6 @@
-### youtube-dl --no-call-home --continue --playlist-reverse --ignore-errors --no-check-certificate --no-playlist -f bestvideo+bestaudio --format mp4 --batch-file yt_links --output /var/www/dwnld/yt/%(channel)s/%(title)s.%(ext)s
+# curl -sLk --cookie-jar cook -A "$(youtube-dl --dump-user-agent)" https://youtube.com > /dev/null
+# youtube-dl --no-call-home --continue --playlist-reverse --ignore-errors --no-check-certificate  --cookies cook --no-playlist -f bestvideo+bestaudio --format mp4 --batch-file yt_links --output /mnt/data/YT/dop/%(channel)s/%(title)s.%(ext)s
+
 
 # Документальное
 
@@ -16,6 +18,7 @@ https://www.youtube.com/playlist?list=PLWC_P718eyWMDKgx42VkUu7C5QOJiQvgl #1946-5
 ## Другие
 https://www.youtube.com/playlist?list=PLguYHBi01DWpt049DdtC4PAD748BskRKX #Редакция. Полный формат
 https://www.youtube.com/playlist?list=PLosWRcTJZf2rOxbZAer-9zWvdosM4VRsq #Минаев - Уроки истории
+https://www.youtube.com/playlist?list=PLosWRcTJZf2q6IF9Pr8NzlmugeY9mWJtS #Минаев - Простые вещи
 
 # Образовательное
 
@@ -45,8 +48,9 @@ https://www.youtube.com/user/0420to #TO420
 https://www.youtube.com/c/MasyanyaKuvaeva
 
 ## Потупить
-https://www.youtube.com/c/aocore #Лёша Корепанов - о том, как быть айтишником
+https://www.youtube.com/channel/UC3eNkWH9RdJn7HYbPU_-jWQ #Андрей Загудаев
 https://www.youtube.com/playlist?list=PLEaW6Stj8WijieAtCJF_yhBdmxxZEb3bc #Ролики, где старался Кунгуров
+https://www.youtube.com/playlist?list=PLZ8LvSCE_MJR_0mQzyWI-ldcF7CuDS1Y9 #Истории краха
 https://www.youtube.com/playlist?list=PLhI-JQSdkYDVSXHLuLJEX4lziE9zHf0Uj #ЧБУ - [Анализ и эссе]
 https://www.youtube.com/watch?v=ePVjWmat0j4 # [ЧБУ] Морфеус — программа
 https://www.youtube.com/c/vdud
@@ -58,13 +62,9 @@ https://www.youtube.com/watch?v=XYHLeZ8rmAg #Amon Tobin - Foley Room Live In Bru
 https://www.youtube.com/watch?v=wptkkVKCse0 #Amon Tobin - 4 Deck Set, Recorded in Seattle 2009
 https://www.youtube.com/watch?v=NWjWikIukWY #Progressive Psytrance mix Aug 2018 [ Boom festival 2018 edition]
 https://www.youtube.com/watch?v=1qzSagjh1ck #Russian hardbass mix 4h
-https://www.youtube.com/watch?v=Weprhcg78bY #НАУТИЛУС ПОМПИЛИУС ✪ ВСЕ ХИТЫ ✪ ЛУЧШИЕ ПЕСНИ РУССКОГО РОКА ✪
-https://www.youtube.com/watch?v=UcX88y4WQ4c #✮ R̲a̲mms̲te̲in ✮ Discography - 1995 - 2009 ✮
-https://www.youtube.com/watch?v=UPd76O6M4do #R A M M S T E I N Greatest Hits Full Album - Best Songs Of R A M M S T E I N Playlist 2021
 https://www.youtube.com/watch?v=DY1s9SmrQRE #Carpenter Brut - Trilogy
 https://www.youtube.com/playlist?list=PL9e7gmwejeGpNRxXByZKvm1cfdEdXG9-s #Carpenter Brut - Official Videos
 https://www.youtube.com/watch?v=3qsUvCmA7PI #3 hours of Prophecy Theme from DUNE (1984) Soundtrack, Relaxing Sleep Sound
-https://www.youtube.com/watch?v=Zb6xEl4IMgQ #Сборник песен ssshhhiiittt!
 https://www.youtube.com/channel/UClld-el6JSE_GvbhTnBEFUA #Speck of Dust
 https://www.youtube.com/watch?v=KxIvINLhfwY #Psychedelic Trance mix February2018 [Cuphead/Mugman edition]
 https://www.youtube.com/watch?v=ZH6JUqPX8iE #Cyberpunk 2077 (OST) Full / Complete Official Soundtrack - Original Game Soundtrack [FULL ALBUM]
@@ -78,7 +78,6 @@ https://www.youtube.com/watch?v=6WbvIEL5Iyk #Homeworld OST
 https://www.youtube.com/watch?v=juOB-IbCwJc #Homeworld OST
 
 # Совсем другое
-https://www.youtube.com/watch?v=G6BMEtsF4WA #Ведьмак 3. Гюнтер о'Дим даёт советы Геральту по общению с Цири.
 https://www.youtube.com/watch?v=DfA2BKPOhCA #Оптимизируем игру до 2 КИЛОБАЙТ
 https://www.youtube.com/watch?v=nsgQcRxf3e0 #SOMA: Transmission - весь фильм на русском языке
-
+https://www.youtube.com/watch?v=UBFt2SH-EUI #Far Cry На своём опыте
