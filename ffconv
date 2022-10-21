@@ -1,0 +1,62 @@
+#!/bin/bash
+
+set -e
+
+video_formats="avi mkv ts mov m2v m4v flv mpg mpeg webm wmv"
+audio_formats="mka ac3"
+subtitle_formats="srt ass"
+
+source_videos=$(find "$(pwd)" -type f $(for i in ${video_formats}; do echo -n "-regex .+\.${i} -o "; done | sed 's/-o $//g'))
+
+[ -z "${source_videos}" ] && (echo "VIDEO FILES NOT FOUND!" && exit 1)
+
+for s_vid in $(echo -e "${source_videos}" | sed 's/ /✖✚/g'); do
+  s_vid="$(echo ${s_vid} | sed 's/✖✚/ /g')"
+  w_dir=$(echo "${s_vid}" | sed 's/\/[^\/]*$//')
+  s_clrpath=$(basename "${s_vid}" | sed 's/\.[^\.]*$//')
+  for i in ${audio_formats}; do
+    [ -f "${w_dir}/${s_clrpath}.${i}" ] && s_aud="${w_dir}/${s_clrpath}.${i}"
+  done
+  for i in ${subtitle_formats}; do
+    [ -f "${w_dir}/${s_clrpath}.${i}" ] && s_sub="${w_dir}/${s_clrpath}.${i}"
+  done
+  out_file="$(echo ${s_clrpath} | sed 's/\W//g')"
+  out_file="${w_dir}/${out_file}.mp4"
+
+  [ ! -d "$(echo ${out_file} | sed 's/\/[^\/]*$//')" ] && mkdir -p "$(echo ${out_file} | sed 's/\/[^\/]*$//')"
+
+  [ -n "${s_sub}" ] && c_sub="-vf subtitles=\"${s_sub}\""
+  
+  if [ -n "${s_aud}" ]; then
+    c_aud="-i \"${s_aud}\""
+    c_aud_map="1:0"
+  else
+    c_aud_map="$(ffprobe -i "${s_vid}" 2>&1 | grep rus | awk '/Stream .* Audio/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\)[(:].*/\1/g')"
+    [ -z "${c_aud_map}" ] && c_aud_map="0:1"
+  fi
+
+  c_vid_map="$(ffprobe -i "${s_vid}" 2>&1 | grep default | awk '/Stream .* Video/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\)[(:].*/\1/g')"
+  if [ -z "${c_vid_map}" ]; then
+    c_vid_map=$(ffprobe -i "${s_vid}" 2>&1 | awk '/Stream .* Video/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\)[(:].*/\1/g')
+  fi
+
+  command="\nffmpeg -y -i \"${s_vid}\" ${c_aud} -map ${c_vid_map} -map ${c_aud_map} ${c_sub} -crf 18 \"${out_file}\""
+  commands+="${command}"
+  unset s_clrpath out_file s_sub s_aud s_vid c_aud c_sub command
+done
+
+echo -e "${commands}\n\n" | sort
+while true; do
+  read -p "Continue? [y/n] " cont
+  case ${cont,,} in
+    y*) break ;;
+    n*) exit 0 ;;
+    *) ;;
+  esac
+done
+
+for i in $(echo -e "${commands}" | sed 's/ /✖✚/g' | sort); do
+  command="$(echo ${i} | sed 's/✖✚/ /g')"
+  echo -e "\n\n\n${command}"
+  bash -c "${command}"
+done
