@@ -1,5 +1,5 @@
 # curl -sLk --cookie-jar cook -A "$(youtube-dl --dump-user-agent)" https://youtube.com > /dev/null
-# youtube-dl --no-call-home --continue --playlist-reverse --ignore-errors --no-check-certificate  --cookies cook --no-playlist -f bestvideo+bestaudio --format mp4 --batch-file yt_links --output /mnt/data/YT/dop/%(channel)s/%(title)s.%(ext)s
+# youtube-dl --no-call-home --continue --playlist-reverse --ignore-errors --no-check-certificate  --cookies cook --no-playlist -f bestvideo+bestaudio --format mp4 --batch-file yt_links --output "/mnt/data/www/video/youtube/%(channel)s/%(title)s.%(ext)s"
 
 
 # Документальное
@@ -21,6 +21,44 @@ https://www.youtube.com/playlist?list=PLosWRcTJZf2rOxbZAer-9zWvdosM4VRsq #Мин
 https://www.youtube.com/playlist?list=PLosWRcTJZf2q6IF9Pr8NzlmugeY9mWJtS #Минаев - Простые вещи
 
 # Образовательное
+https://www.youtube.com/playlist?list=PLRDzFCPr95fK7tr47883DFUbm4GeOjjc0  # 2017-2018 Алгоритмы и структуры данных на Python 3
+https://www.youtube.com/playlist?list=PLoQVUgEFJ28zaJyQAigGrzHWtdcgUSQKd  # Химические элементы
+https://www.youtube.com/playlist?list=PLE5E65E9A742BF6D1                  # МИФИ: 1.1 КИНЕМАТИКА
+https://www.youtube.com/playlist?list=PL04E078C955FC10E5                  # МИФИ: 1.2 ДИНАМИКА МАТЕРИАЛЬНОЙ ТОЧКИ 1
+https://www.youtube.com/playlist?list=PL153584A2CF36B4CA                  # МИФИ: 1.3 ДИНАМИКА МАТЕРИАЛЬНОЙ ТОЧКИ 2
+https://www.youtube.com/playlist?list=PL32C81AC7B5EA0E12                  # МИФИ: 1.4 ЗАКОНЫ СОХРАНЕНИЯ 1
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjNWXvjsg3BGeErxGJdoWkUq  # МИФИ: 1.5 ЗАКОНЫ СОХРАНЕНИЯ 2
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjNCIENKwsbTo1TVUsMk8jzT  # МИФИ: 1.6 ЗАКОНЫ СОХРАНЕНИЯ 3
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjM-U4oVTa0wvueFCsbucQp7  # МИФИ: 1.7 НЕИНЕРЦИАЛЬНЫЕ СИСТ. ОТСЧЕТА
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjPPk25588SprpCu6i7Peb-S  # МИФИ: 1.8 МЕХАНИКА ТВЁРДОГО ТЕЛА 1
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjN8T5f_KcaDxiNndXPu85rQ  # МИФИ: 1.9 МЕХАНИКА ТВЁРДОГО ТЕЛА 2
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjOfERZplGdwNguMcjcZuOny  # МИФИ: 1.10 МЕХАНИКА ТВЕРДОГО ТЕЛА 3
+https://www.youtube.com/playlist?list=PL05B9E2A8DC2A710F                  # МИФИ: 2.1 ГАРМОНИЧЕСКИЕ КОЛЕБАНИЯ
+https://www.youtube.com/playlist?list=PLC16C189B21D0F649                  # МИФИ: 2.2 СЛОЖЕНИЕ КОЛЕБАНИЙ
+https://www.youtube.com/playlist?list=PL9F96E1E5307658DB                  # МИФИ: 2.3 ЗАТУХАЮЩИЕ КОЛЕБАНИЯ
+https://www.youtube.com/playlist?list=PL0EF568B1B4D11D88                  # МИФИ: 2.4 ВЫНУЖДЕННЫЕ КОЛЕБАНИЯ
+https://www.youtube.com/playlist?list=PLC380EE9E8F2526AA                  # МИФИ: 2.5 МОЛЕКУЛЯРНАЯ ФИЗИКА. НАЧАЛО
+https://www.youtube.com/playlist?list=PL1B0ABC56C7781840                  # МИФИ: 2.6 ОСНОВЫ СТАТИСТИЧЕСКОЙ ФИЗИКИ
+https://www.youtube.com/playlist?list=PLA50683879CCE6751                  # МИФИ: 2.7 КРИСТАЛЛИЧ. И ЖИДКОЕ СОСТОЯНИЯ
+https://www.youtube.com/playlist?list=PL97A618CD0438CB24                  # МИФИ: 2.8 ФАЗОВЫЕ ПРЕВРАЩЕНИЯ
+https://www.youtube.com/playlist?list=PL157D6AC00ECCC3FA                  # МИФИ: 2.9 ЯВЛЕНИЯ ПЕРЕНОСА
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjPtxE1E-4-nMw_zs4BdyeeU  # МИФИ: 3.1 ЭЛЕКТРИЧЕСКОЕ ПОЛЕ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjPep7daowLe6lYQzw4d2eQm  # МИФИ: 3.2 ПРОВОДНИКИ В ЭЛЕКТРИЧ. ПОЛЕ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjNa2fj4KhZVDfvzQkCta97l  # МИФИ: 3.3 ЭНЕРГИЯ ЭЛЕКТРИЧЕСКОГО ПОЛЯ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjOvDBfNI_-V-DT2dJ5AHQnv  # МИФИ: 3.4 ПОСТОЯННЫЙ ЭЛЕКТРИЧЕСКИЙ ТОК
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjPns4A7jeEAGURh_BBV3Grt  # МИФИ: 3.5 МАГНИТНОЕ ПОЛЕ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjPLbEwfdiidIy-HwOkj1Mxv  # МИФИ: 3.6 МАГНИТНОЕ ПОЛЕ В ВЕЩЕСТВЕ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjOm1VahNbxIPaTO-3W4iP2_  # МИФИ: 3.7 ЭЛЕКТРОМАГНИТНАЯ ИНДУКЦИЯ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjNawc8L5_E4LNgKGP3nqL2t  # МИФИ: 3.8 КВАЗИСТАЦИОНАРНЫЕ ТОЧКИ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjMYs1Dm6PcmybqUhguQoLvV  # МИФИ: 3.9 ЭЛЕКТРИЧЕСКИЙ ТОК В ГАЗАХ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjNkI1_fdTv6qGnC8i-O9KxQ  # МИФИ: 4.1 МОДЕЛИ ВОЛН. СКОРОСТЬ СВЕТА
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjO79CJjGn7x0NmcgZ10ZsJd  # МИФИ: 4.2 ПОЛЯРИЗАЦИЯ ВОЛН
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjN-LXdSCKSiPBFyBhl4HC-R  # МИФИ: 4.3 ЗАКОНЫ ОТРАЖЕНИЯ И ПРЕЛОМЛЕНИЯ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjNDN4XPpg_xfqoGuK8qL-5J  # МИФИ: 4.4 СТОЯЧИЕ ВОЛНЫ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjMk3RXD9_mGKil32M0BRUlT  # МИФИ: 4.5 ИНТЕРФЕРЕНЦИЯ ВОЛН
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjOrykp022JgytaCZWRKTk_e  # МИФИ: 4.6 ДИФРАКЦИЯ ФРЕНЕЛЯ
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjPoE0BGX1-9-EUJWSgheIWI  # МИФИ: 4.7 ДИФРАКЦИЯ ФРАУНГОФЕРА
+https://www.youtube.com/playlist?list=PLWM8IO-3TQjPXg-YnTlm52sjVKTr9s5NM  # МИФИ: 4.8 ВОЛНЫ В АНИЗОТРОПНЫХ СРЕДАХ
 
 ## Хохлов Сабатовский
 https://www.youtube.com/playlist?list=PLX9plZEau9JzoVeu-Bsf33hhVHdmqRFCL #Уроки DaVinci Resolve
@@ -33,12 +71,13 @@ https://www.youtube.com/playlist?list=PLX9plZEau9JwL2-a6V33HYiTeX_ekWfgS #Инт
 ## Другие
 https://www.youtube.com/c/AlexGyverShow
 https://www.youtube.com/c/SergeyGavruk #Golang
-https://www.youtube.com/c/IvanAvdeev
 https://www.youtube.com/c/DavidMahler
 https://www.youtube.com/user/slylama
 https://www.youtube.com/playlist?list=PLeNbGOow-rnfgGftvHZfb7T43rBIo_lyr #Лучшие видео Arzamas
 https://www.youtube.com/playlist?list=PL5htYdrGMzXN5klqFErjPhiVZOWLqQto_ #Гитарист ТВ. Для начинающих
+https://www.youtube.com/playlist?list=PL-SY5_CFKjGBhewzyBkGM9epJkpxToNY9 #Guitar Lessons
 https://www.youtube.com/playlist?list=PLjgai-5_Ef9rjfUW-cR_xj3GhIKhaSO3m #JamieFenn - 🔥 THE BEST DAVINCI RESOLVE EFFECTS 🔥
+https://www.youtube.com/playlist?list=PL0xCSYnG_iTuSXq9XJnv4rANAzmceZ6B5 #OFFZONE 2022 
 
 # Развлекательное
 https://www.youtube.com/user/TheBadComedian
@@ -57,22 +96,46 @@ https://www.youtube.com/c/vdud
 https://www.youtube.com/c/SciOne
 
 ## Музыка
-https://www.youtube.com/watch?v=C5kluAgG6qE #NPP
+### Клипы
+https://www.youtube.com/playlist?list=PL4070CAFC1434353F # NOISIA - Music Videos
+https://www.youtube.com/playlist?list=PLC942ECF206D3047A # MUSE :: Official Videos
+https://www.youtube.com/playlist?list=PLETB5bOsgcnI73WMhyN8HN7OUT9AKAqas # Blur Official Music Videos Playlist
+https://www.youtube.com/playlist?list=PLVTLbc6i-h_iuhdwUfuPDLFLXG2QQnz-x # Rammstein - Official Music Videos
+https://www.youtube.com/playlist?list=PL9e7gmwejeGpNRxXByZKvm1cfdEdXG9-s # Carpenter Brut - Official Videos
+https://www.youtube.com/playlist?list=PL_X5gRGCv_LIviXxkHHks4znyS4JTBSER # Amon Tobin Official Videos
+https://www.youtube.com/playlist?list=PLehc7hUpc5V9qRiFT3lqlrCW5uXo8VHAS # Pendulum - Official Videos
+https://www.youtube.com/playlist?list=PLVONh1wUPeQncQkt5O0xiK-1gRgPolyt7 # The Prodigy
+https://www.youtube.com/playlist?list=PLFvWvKNSjZmQmF0kCJwzfJGUQA6ugkNFH # Best of Bloodhound Gang
+
+### Каналы
+https://www.youtube.com/user/KARETNYKOV/videos # Никого нет дома
+
+### Плейлисты
+https://www.youtube.com/playlist?list=PL6yvKJIWxl5mumY87NX71A9NLKNzPKvSD # EN [sGood]
+https://www.youtube.com/playlist?list=PL6yvKJIWxl5mfccVEzjSVIwIffxgU3Yfv # Music
+https://www.youtube.com/playlist?list=PL6yvKJIWxl5l8StTxTf0CHLhhZYspZhCu # DnB
+
+### Сеты
 https://www.youtube.com/watch?v=XYHLeZ8rmAg #Amon Tobin - Foley Room Live In Brussels [Full DJ Set]
 https://www.youtube.com/watch?v=wptkkVKCse0 #Amon Tobin - 4 Deck Set, Recorded in Seattle 2009
 https://www.youtube.com/watch?v=NWjWikIukWY #Progressive Psytrance mix Aug 2018 [ Boom festival 2018 edition]
 https://www.youtube.com/watch?v=1qzSagjh1ck #Russian hardbass mix 4h
 https://www.youtube.com/watch?v=DY1s9SmrQRE #Carpenter Brut - Trilogy
 https://www.youtube.com/playlist?list=PL9e7gmwejeGpNRxXByZKvm1cfdEdXG9-s #Carpenter Brut - Official Videos
+https://www.youtube.com/watch?v=Zb6xEl4IMgQ #Сборник песен ssshhhiiittt!
+https://www.youtube.com/watch?v=KxIvINLhfwY #Psychedelic Trance mix February2018 [Cuphead/Mugman edition]
+https://www.youtube.com/watch?v=geajCOmYRcw #Psychedelic Trance mix November 2017 [video game : Cuphead / Trippy Cartoon]
+https://www.youtube.com/watch?v=JPfVwOd6jDc #Russian Post-Punk Collection Vol2
+https://www.youtube.com/watch?v=BXX0qeyzy80 #Klaus Doldinger - Das Boot (Single Version)
+
+### OST
+https://www.youtube.com/watch?v=C5kluAgG6qE #NPP
 https://www.youtube.com/watch?v=3qsUvCmA7PI #3 hours of Prophecy Theme from DUNE (1984) Soundtrack, Relaxing Sleep Sound
 https://www.youtube.com/channel/UClld-el6JSE_GvbhTnBEFUA #Speck of Dust
-https://www.youtube.com/watch?v=KxIvINLhfwY #Psychedelic Trance mix February2018 [Cuphead/Mugman edition]
 https://www.youtube.com/watch?v=ZH6JUqPX8iE #Cyberpunk 2077 (OST) Full / Complete Official Soundtrack - Original Game Soundtrack [FULL ALBUM]
 https://www.youtube.com/watch?v=VWziHqEd0Uw #Diablo 2 - Complete Soundtrack HD
 https://www.youtube.com/watch?v=iFOfSlDCwYw #Diablo Theme Tristram Music 10 HOURS
 https://www.youtube.com/watch?v=P3ZrN-m7VJA #Diablo 2 Soundtrack (Full)
-https://www.youtube.com/watch?v=geajCOmYRcw #Psychedelic Trance mix November 2017 [video game : Cuphead / Trippy Cartoon]
-https://www.youtube.com/watch?v=JPfVwOd6jDc #Russian Post-Punk Collection Vol2
 https://www.youtube.com/watch?v=e6LRTwMc01k #Homeworld OST
 https://www.youtube.com/watch?v=6WbvIEL5Iyk #Homeworld OST
 https://www.youtube.com/watch?v=juOB-IbCwJc #Homeworld OST
