@@ -49,14 +49,13 @@ for s_vid in $(echo -e "${source_videos}" | sed 's/ /✖✚/g'); do
   fi
 
   c_aud_map_eng="$(ffprobe -i "${s_vid}" 2>&1 | grep eng | awk '/Stream .* Audio/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\{,2\}\)[(:\[].*/\1/g')"
-  #c_sub_map="$(ffprobe -i "${s_vid}" 2>&1 | grep rus | awk '/Stream .* Subtitle/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\{,2\}\)[(:\[].*/\1/g')"
 
   c_vid_map="$(ffprobe -i "${s_vid}" 2>&1 | grep default | awk '/Stream .* Video/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\{,2\}\)[(:\[].*/\1/g')"
   if [ -z "${c_vid_map}" ]; then
     c_vid_map=$(ffprobe -i "${s_vid}" 2>&1 | awk '/Stream .* Video/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\{,2\}\)[(:\[].*/\1/g')
   fi
 
-  command="\nffmpeg -y -i \"${s_vid}\" ${c_aud} -map ${c_vid_map} -map ${c_aud_map} ${c_aud_map_eng:+-map }${c_aud_map_eng} ${c_sub_map:+-map }${c_sub_map} ${c_sub} ${v_codec:+-c:v }${v_codec} ${v_codec_quality_flag} 18 -ac 2 -b:a 1500k \"${out_file}\""
+  command="\nffmpeg -y -i \"${s_vid}\" ${c_aud} -map ${c_vid_map} -map ${c_aud_map} ${c_aud_map_eng:+-map }${c_aud_map_eng} -map 0:s? -c:s mov_text ${c_sub} ${v_codec:+-c:v }${v_codec} ${v_codec_quality_flag} 20 -ac 2 -b:a 1500k \"${out_file}\""
 
   commands+="${command}"
   unset s_clrpath out_file s_sub s_aud s_vid c_aud c_sub v_codec command
