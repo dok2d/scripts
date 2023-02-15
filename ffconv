@@ -1,9 +1,21 @@
 #!/bin/bash
 
+## ABOUT
+## Generate command for convert any videos to mp4[h264] with ffmpeg and run it
+## 
+## INSTALL
+## cp ffconv /usr/local/bin/
+## chmod +x /usr/local/bin/ffconv
+## 
+## USAGE
+## ffconv                  # Convert FROM current dir TO current dir
+## ffconv subdir1 subdir2  # Convert FROM subdir1 TO subdir2
+## ffconv 01.avi subdir2   # Convert 01.avi TO subdir2
+
 set -e
 
 video_formats="avi mkv ts mov m2v m4v flv mpg mpeg webm wmv m2ts"
-audio_formats="mka ac3"
+audio_formats="mka ac3 mp3"
 subtitle_formats="srt ass"
 
 [ -z "${1}" ] && source_dir="${PWD}"
@@ -12,6 +24,7 @@ subtitle_formats="srt ass"
 [ -n "${source_dir}" ] && source_videos=$(find "${source_dir}" -type f $(for i in ${video_formats}; do echo -n "-regex .+\.${i} -o "; done | sed 's/-o $//g'))
 [ -f "${1}" ] && source_videos=$(realpath "${1}")
 
+[ -n "${2}" -a ! -e "${2}" ] && mkdir -p "${2}"
 [ -n "${2}" ] && out_dir=$(realpath "${2}")
 
 [ -z "${source_videos}" ] && (echo "VIDEO FILES NOT FOUND!" && exit 1)
@@ -21,7 +34,7 @@ for s_vid in $(echo -e "${source_videos}" | sed 's/ /✖✚/g'); do
   w_dir=$(echo "${s_vid}" | sed 's/\/[^\/]*$//')
   s_clrpath=$(basename "${s_vid}" | sed 's/\.[^\.]*$//')
   s_vid_color_profile="$(ffprobe -v error -show_streams -select_streams v:0 "${s_vid}" -of json | jq -r '.streams[] | .profile')"
-  [ "${s_vid_color_profile}" = "Main 10" ] || v_codec=h264_nvenc
+  [ "${s_vid_color_profile}" = "Main 10" -o "${s_vid_color_profile}" = "High 10" ] || v_codec=h264_nvenc
   [ "${v_codec}" = "h264_nvenc" ] && v_codec_quality_flag="-cq:v" || v_codec_quality_flag="-crf"
 
   for i in ${audio_formats}; do
@@ -58,7 +71,7 @@ for s_vid in $(echo -e "${source_videos}" | sed 's/ /✖✚/g'); do
     c_vid_map=$(ffprobe -i "${s_vid}" 2>&1 | awk '/Stream .* Video/ {print;exit 0}' | sed 's/.* #\([0-9]:[0-9]\{,2\}\)[(:\[].*/\1/g')
   fi
 
-  command="\nffmpeg -y -i \"${s_vid}\" ${c_aud} -map ${c_vid_map} -map ${c_aud_map} ${c_aud_map_second:+-map }${c_aud_map_second} -map 0:s? -c:s mov_text ${c_sub} ${v_codec:+-c:v }${v_codec} ${v_codec_quality_flag} 20 -ac 2 -b:a 1500k \"${out_file}\""
+  command="\nffmpeg -y -i \"${s_vid}\" ${c_aud} -map ${c_vid_map} -map ${c_aud_map} ${c_aud_map_second:+-map }${c_aud_map_second} -map 0:s? -c:s copy ${c_sub} ${v_codec:+-c:v }${v_codec} ${v_codec_quality_flag} 20 -ac 2 -b:a 1500k \"${out_file}\""
 
   commands+="${command}"
   unset s_clrpath out_file s_sub s_aud s_vid c_aud c_sub v_codec c_aud_map_second command
