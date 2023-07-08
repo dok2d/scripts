@@ -13,6 +13,7 @@ for dir in $(echo -e "${track_dirs}" | sed 's/ /✖✚/g'); do
   cat << EOF > "${dir_o}/.webamp.js"
 const Webamp = window.Webamp;
 const webamp = new Webamp({
+enableHotkeys: true,
 initialTracks: [
 $(for i in $(echo -e "${mp3s}" | sed 's/ /✖✚/g' | sort); do
   track_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
