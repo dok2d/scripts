@@ -4,18 +4,18 @@ set -e
 
 audio_formats="mp3\|wav\|flac\|m4a"
 
-track_dirs="$(find "$(pwd)" -type f -regex ".+\.\(${audio_formats}\)" -exec dirname "{}" \; | sort -u)"
+track_dirs="$(find "$(pwd)" -type f -iregex ".+\.\(${audio_formats}\)" -exec dirname "{}" \; | sort -u)"
 
 for dir in $(echo -e "${track_dirs}" | sed 's/ /✖✚/g'); do
   echo -n "$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")..  "
   dir_o="$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")"
-  mp3s=$(find "${dir_o}" -maxdepth 1 -type f -regex ".+\.\(${audio_formats}\)" -exec basename {} \;)
+  tracks=$(find "${dir_o}" -maxdepth 1 -type f -iregex ".+\.\(${audio_formats}\)" -exec basename {} \;)
   cat << EOF > "${dir_o}/.webamp.js"
 const Webamp = window.Webamp;
 const webamp = new Webamp({
 enableHotkeys: true,
 initialTracks: [
-$(for i in $(echo -e "${mp3s}" | sed 's/ /✖✚/g' | sort); do
+$(for i in $(echo -e "${tracks}" | sed 's/ /✖✚/g' | sort); do
   track_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
   track_artist=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
   track_title=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
