@@ -1,26 +1,31 @@
 #!/bin/bash
-# Generating playlists of mp3 files in nested directories for webamp (webamp.org)
+# Generating playlists of audio files in nested directories for webamp (webamp.org)
 set -e
 
-mp3_dirs="$(find "$(pwd)" -type f -name "*.mp3" -exec dirname "{}" \; | sort -u)"
+audio_formats="mp3\|wav\|flac\|m4a"
 
-for dir in $(echo -e "${mp3_dirs}" | sed 's/ /✖️✚/g'); do
-  echo -n "$(realpath "$(echo ${dir} | sed 's/✖️✚/ /g')")..  "
-  dir_o="$(realpath "$(echo ${dir} | sed 's/✖️✚/ /g')")"
-  mp3s=$(find "${dir_o}" -maxdepth 1 -type f -name "*.mp3" -exec basename {} \;)
+mp3_dirs="$(find "$(pwd)" -type f -regex ".+\.\(${audio_formats}\)" -exec dirname "{}" \; | sort -u)"
+
+for dir in $(echo -e "${mp3_dirs}" | sed 's/ /✖✚/g'); do
+  echo -n "$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")..  "
+  dir_o="$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")"
+  mp3s=$(find "${dir_o}" -maxdepth 1 -type f -regex ".+\.\(${audio_formats}\)" -exec basename {} \;)
   cat << EOF > "${dir_o}/.webamp.js"
 const Webamp = window.Webamp;
 const webamp = new Webamp({
 initialTracks: [
-$(for i in $(echo -e "${mp3s}" | sed 's/ /✖️✚/g' | sort); do
-  mp3_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖️✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
-  mp3_artist=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖️✚/ /g')" -v error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
-  mp3_title=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖️✚/ /g')" -v error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
+$(for i in $(echo -e "${mp3s}" | sed 's/ /✖✚/g' | sort); do
+  mp3_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
+  mp3_artist=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
+  mp3_title=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
+
+  [ -z "${mp3_artist}" ] && mp3_artist=$(echo ${i} | sed 's/✖✚/ /g')
+  [ -z "${mp3_title}" ]  && mp3_title=" "
 
   echo -e "  {"
   [ -n "${mp3_artist}" -o -n "${mp3_title}" ] && \
   echo -e "    metaData: {\n      ${mp3_artist:+artist: \"}${mp3_artist}${mp3_artist:+\",}\n      ${mp3_title:+title: \"}${mp3_title}${mp3_title:+\"}},"
-  echo -e "    url: \"$(echo ${i} | sed 's/✖️✚/ /g')\",\n    duration: ${mp3_duration}\n  },"
+  echo -e "    url: \"$(echo ${i} | sed 's/✖✚/ /g')\",\n    duration: ${mp3_duration}\n  },"
   unset mp3_duration mp3_artist mp3_title
 done)
 ],
