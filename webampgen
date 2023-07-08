@@ -4,9 +4,9 @@ set -e
 
 audio_formats="mp3\|wav\|flac\|m4a"
 
-mp3_dirs="$(find "$(pwd)" -type f -regex ".+\.\(${audio_formats}\)" -exec dirname "{}" \; | sort -u)"
+track_dirs="$(find "$(pwd)" -type f -regex ".+\.\(${audio_formats}\)" -exec dirname "{}" \; | sort -u)"
 
-for dir in $(echo -e "${mp3_dirs}" | sed 's/ /✖✚/g'); do
+for dir in $(echo -e "${track_dirs}" | sed 's/ /✖✚/g'); do
   echo -n "$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")..  "
   dir_o="$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")"
   mp3s=$(find "${dir_o}" -maxdepth 1 -type f -regex ".+\.\(${audio_formats}\)" -exec basename {} \;)
@@ -15,18 +15,18 @@ const Webamp = window.Webamp;
 const webamp = new Webamp({
 initialTracks: [
 $(for i in $(echo -e "${mp3s}" | sed 's/ /✖✚/g' | sort); do
-  mp3_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
-  mp3_artist=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
-  mp3_title=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
+  track_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
+  track_artist=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
+  track_title=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
 
-  [ -z "${mp3_artist}" ] && mp3_artist=$(echo ${i} | sed 's/✖✚/ /g')
-  [ -z "${mp3_title}" ]  && mp3_title=" "
+  [ -z "${track_artist}" ] && track_artist=$(echo ${i} | sed 's/✖✚/ /g')
+  [ -z "${track_title}" ]  && track_title=" "
 
   echo -e "  {"
-  [ -n "${mp3_artist}" -o -n "${mp3_title}" ] && \
-  echo -e "    metaData: {\n      ${mp3_artist:+artist: \"}${mp3_artist}${mp3_artist:+\",}\n      ${mp3_title:+title: \"}${mp3_title}${mp3_title:+\"}},"
-  echo -e "    url: \"$(echo ${i} | sed 's/✖✚/ /g')\",\n    duration: ${mp3_duration}\n  },"
-  unset mp3_duration mp3_artist mp3_title
+  [ -n "${track_artist}" -o -n "${track_title}" ] && \
+  echo -e "    metaData: {\n      ${track_artist:+artist: \"}${track_artist}${track_artist:+\",}\n      ${track_title:+title: \"}${track_title}${track_title:+\"}},"
+  echo -e "    url: \"$(echo ${i} | sed 's/✖✚/ /g')\",\n    duration: ${track_duration}\n  },"
+  unset track_duration track_artist track_title
 done)
 ],
 });
