@@ -25,7 +25,7 @@ subtitle_formats="srt ass"
 [ -z "${1}" ] && source_dir="${PWD}"
 [ -d "${1}" ] && source_dir=$(realpath "${1}")
 
-[ -n "${source_dir}" ] && source_videos=$(find "${source_dir}" -type f $(for i in ${video_formats}; do echo -n "-regex .+\.${i} -o "; done | sed 's/-o $//g'))
+[ -n "${source_dir}" ] && source_videos=$(find "${source_dir}" -type f $(for i in ${video_formats}; do echo -n "-iregex .+\.${i} -o "; done | sed 's/-o $//g'))
 [ -f "${1}" ] && source_videos=$(realpath "${1}")
 
 [ -n "${2}" -a ! -e "${2}" ] && mkdir -p "${2}"
