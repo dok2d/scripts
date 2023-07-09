@@ -1,0 +1,32 @@
+#!/bin/bash
+# Generating playlists of video files in nested directories for videojs (videojs.com)
+set -e
+
+video_formats="mp4\|mpg\|ts\|mov\|m4v"
+
+video_dirs="$(find "$(pwd)" -type f -iregex ".+\.\(${video_formats}\)" -exec dirname "{}" \; | sort -u)"
+
+for dir in $(echo -e "${video_dirs}" | sed 's/ /✖✚/g'); do
+  echo -n "$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")..  "
+  dir_o="$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")"
+  videos=$(find "${dir_o}" -maxdepth 1 -type f -iregex ".+\.\(${video_formats}\)" -exec basename {} \;)
+  [ ! -d "${dir_o}/.meta" ] && mkdir -p "${dir_o}/.meta"
+  cat << EOF > "${dir_o}/.playlist.js"
+var player = videojs('video');
+
+player.playlist([
+$(for i in $(echo -e "${videos}" | sed 's/ /✖✚/g' | sort); do
+  [ ! -f "${dir_o}/.meta/$(echo ${i} | sed 's/✖✚/ /g').png" ] && \
+  ffmpeg -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -ss 00:02:14.435 -frames:v 1 -filter:v scale="400:-1" "${dir_o}/.meta/$(echo ${i} | sed 's/✖✚/ /g').png"
+
+  echo -e "{  sources: [{"
+  echo -e "    src: '$(echo ${i} | sed 's/✖✚/ /g')',"
+  echo -e "    type: 'video/mp4'}],"
+  echo -e "poster: '.meta/$(echo ${i} | sed 's/✖✚/ /g').png'},"
+done)
+]);
+
+player.playlist.autoadvance(0);
+EOF
+  echo ok
+done
