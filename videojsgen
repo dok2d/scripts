@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generating playlists of video files in nested directories for videojs (videojs.com)
+# Generating playlists of video files in nested directories for videojs / videojs-playlist-ui (videojs.com / github.com/videojs/videojs-playlist-ui)
 set -e
 
 video_formats="mp4\|mpg\|ts\|mov\|m4v"
@@ -30,7 +30,6 @@ $(for i in $(echo -e "${videos}" | sed 's/ /✖✚/g' | sort); do
 done)
 ]);
 
-// Play through the playlist automatically.
 player.playlist.autoadvance(0);
 EOF
   echo ok
