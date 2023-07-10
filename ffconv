@@ -2,11 +2,11 @@
 
 ## ABOUT
 ## Generate command for convert any videos to mp4[h264] with ffmpeg and run it
-## 
+##
 ## INSTALL
 ## cp ffconv /usr/local/bin/
 ## chmod +x /usr/local/bin/ffconv
-## 
+##
 ## USAGE
 ## ffconv                  # Convert FROM current dir TO current dir
 ## ffconv subdir1 subdir2  # Convert FROM subdir1 TO subdir2
@@ -29,7 +29,7 @@ subtitle_formats="srt ass"
 [ -f "${1}" ] && source_videos=$(realpath "${1}")
 
 [ -n "${2}" -a ! -e "${2}" ] && mkdir -p "${2}"
-[ -n "${2}" ] && out_dir=$(realpath "${2}")
+[ -n "${2}" ] && out_dir=$(realpath "${2}") || out_dir_ext="null"
 
 [ -z "${source_videos}" ] && (echo "VIDEO FILES NOT FOUND!" && exit 1)
 
@@ -51,11 +51,12 @@ for s_vid in $(echo -e "${source_videos}" | sed 's/ /✖✚/g'); do
   for i in ${subtitle_formats}; do
     [ -f "${w_dir}/${s_clrpath}.${i}" ] && s_sub="${w_dir}/${s_clrpath}.${i}"
   done
-  [ -z "${out_dir}" ] && out_dir="${w_dir}"
-  out_file="$(echo ${s_clrpath} | sed 's/\W//g')"
+  [ -n "${out_dir_ext}" ] && out_dir="${w_dir}"
+
+  out_file="$(echo ${s_clrpath} | sed 's/[^[:alpha:] [:space:] -_]//g;s/_/ /g;s/[[:space:]]\{2,\}/ /g;s/^[[:space:]]//g;s/"//g' | sed "s/'//g")"
   out_file="${out_dir}/${out_file}.mp4"
 
-  [ ! -d "$(echo ${out_file} | sed 's/\/[^\/]*$//')" ] && mkdir -p "$(echo ${out_file} | sed 's/\/[^\/]*$//')"
+  [ ! -d "${out_dir}" ] && mkdir -p "$(echo ${out_dir})"
 
   [ -n "${s_sub}" ] && c_sub="-vf subtitles=\"$(echo ${s_sub} | sed 's/\[/\\[/g;s/\]/\\]/g')\""
 
