@@ -16,16 +16,17 @@ var player = videojs('video');
 
 player.playlist([
 $(for i in $(echo -e "${videos}" | sed 's/ /✖✚/g' | sort); do
-  video_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
-  [ ! -f "${dir_o}/.meta/$(echo ${i} | sed 's/✖✚/ /g').png" ] && \
-  ffmpeg -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -ss 00:02:14.435 -frames:v 1 -filter:v scale="400:-1" "${dir_o}/.meta/$(echo ${i} | sed 's/✖✚/ /g').png"
+  filename=$(echo ${i} | sed "s/✖✚/ /g;s/'/\\\'/g")
+  video_duration=$(ffprobe -i "${dir_o}/${filename}" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
+  [ ! -f "${dir_o}/.meta/${filename}.png" ] && \
+  ffmpeg -i "${dir_o}/${filename}" -v error -ss 00:02:14.435 -frames:v 1 -filter:v scale="400:-1" "${dir_o}/.meta/${filename}.png"
 
-  echo -e "    {  name: '$(echo ${i} | sed 's/✖✚/ /g')',"
+  echo -e "    {  name: '${filename}',"
   echo -e "       description: '${video_desc}',"
-  echo -e "       duration: ${video_duration},"
-  echo -e "       thumbnail: [{srcset: '.meta/$(echo ${i} | sed 's/✖✚/ /g').png', type: 'image/jpeg', media: '(min-width: 400px;)'}, {src: '.meta/$(echo ${i} | sed 's/✖✚/ /g').png'}],"
-  echo -e "       sources: [{src: '$(echo ${i} | sed 's/✖✚/ /g')', type: 'video/mp4'}],"
-  echo -e "       poster: '.meta/$(echo ${i} | sed 's/✖✚/ /g').png'"
+  echo -e "       duration: '${video_duration}',"
+  echo -e "       thumbnail: [{srcset: '.meta/${filename}.png', type: 'image/jpeg', media: '(min-width: 400px;)'}, {src: '.meta/${filename}.png'}],"
+  echo -e "       sources: [{src: '${filename}', type: 'video/mp4'}],"
+  echo -e "       poster: '.meta/${filename}.png'"
   echo -e "    },"
 done)
 ]);
