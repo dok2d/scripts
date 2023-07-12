@@ -1,37 +1,67 @@
 #!/bin/bash
 # Generating playlists of video files in nested directories for videojs / videojs-playlist-ui (videojs.com / github.com/videojs/videojs-playlist-ui)
+#
+# Example of directory optional config file .playlist_config.js
+# {
+#   "include_dirs": true, # Add all videos from nested directories to playlist
+#   "random": true # Sort the playlist randomly
+# }
+#
+
 set -e
 
-video_formats="mp4\|mpg\|ts\|mov\|m4v"
+video_formats="mp4\|mov\|m4v"
+www_root="/mnt/data/www"  # CHANGEIT OR UNSET
+prefix_url="/ls"  # CHANGEIT OR UNSET
+
+[ -n "${www_root}" -a ! "${www_root:0-1}" = "/" ] && www_root="${www_root}/"
+[ -n "${prefix_url}" -a ! "${prefix_url:0-1}" = "/" ] && prefix_url="${prefix_url}/"
 
 video_dirs="$(find "$(pwd)" -type f -iregex ".+\.\(${video_formats}\)" -exec dirname "{}" \; | sort -u)"
 
 for dir in $(echo -e "${video_dirs}" | sed 's/ /✖✚/g'); do
   echo -n "$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")..  "
   dir_o="$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")"
-  videos=$(find "${dir_o}" -maxdepth 1 -type f -iregex ".+\.\(${video_formats}\)" -exec basename {} \;)
-  [ ! -d "${dir_o}/.meta" ] && mkdir -p "${dir_o}/.meta"
+  videos=$(find "${dir_o}" -maxdepth 1 -type f -iregex ".+\.\(${video_formats}\)")
+  if [ -f "${dir_o}/.playlist_config.js" ]; then
+    for i in random include_dirs; do
+      export "${i}"=$(jq -r ".${i}" "${dir_o}/.playlist_config.js")
+      [ "${i}" = null ] && unset ${i}
+    done
+  fi
+
+  if [ -n "${include_dirs}" ]; then
+    videos="$(find "${dir_o}" -type f -iregex ".+\.\(${video_formats}\)")"
+  fi
+
   cat << EOF > "${dir_o}/.playlist.js"
 var player = videojs('video');
 
 player.playlist([
-$(for i in $(echo -e "${videos}" | sed 's/ /✖✚/g' | sort); do
-  filename=$(echo ${i} | sed "s/✖✚/ /g;s/'/\\\'/g")
-  video_duration=$(ffprobe -i "${dir_o}/${filename}" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
-  [ ! -f "${dir_o}/.meta/${filename}.png" ] && \
-  ffmpeg -i "${dir_o}/${filename}" -v error -ss 00:02:14.435 -frames:v 1 -filter:v scale="400:-1" "${dir_o}/.meta/${filename}.png"
+$(for i in $(echo -e "${videos}" | sed 's/ /✖✚/g' | sort ${random:+-R}); do
+  filename_orig=$(basename "${i}" | sed "s/✖✚/ /g")
+  filename=$(echo "${filename_orig}" | sed "s/'/\\\'/g")
+  dir_f="$(dirname "${i}" | sed "s/✖✚/ /g")/"
+  [ -n "${www_root}" -a -n "${prefix_url}" ] && \
+  dir_l="$(echo "${dir_f}" | sed "s/^${www_root//\//\\\/}/${prefix_url//\//\\\/}/g;s/'/\\\'/g")"
+  [ ! -d "${dir_f}/.meta" ] && mkdir -p "${dir_f}/.meta"
+
+  video_duration=$(ffprobe -i "${dir_f}${filename_orig}" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/\..*//g')
+  [ ! -f "${dir_f}.meta/${filename_orig}.png" -a -n "${video_duration}" ] && \
+  ffmpeg -ss $(expr "${video_duration}" / 3 \* 2) -i "${dir_f}${filename//\\/}" -v error -frames:v 1 -filter:v scale="400:-1" "${dir_f}.meta/${filename_orig}.png"
 
   echo -e "    {  name: '${filename}',"
   echo -e "       description: '${video_desc}',"
   echo -e "       duration: '${video_duration}',"
-  echo -e "       thumbnail: [{srcset: '.meta/${filename}.png', type: 'image/jpeg', media: '(min-width: 400px;)'}, {src: '.meta/${filename}.png'}],"
-  echo -e "       sources: [{src: '${filename}', type: 'video/mp4'}],"
-  echo -e "       poster: '.meta/${filename}.png'"
+  echo -e "       thumbnail: [{srcset: '${dir_l}.meta/${filename}.png', type: 'image/jpeg', media: '(min-width: 400px;)'}, {src: '${dir_l}.meta/${filename}.png'}],"
+  echo -e "       sources: [{src: '${dir_l}${filename}', type: 'video/mp4'}],"
+  echo -e "       poster: '${dir_l}.meta/${filename}.png'"
   echo -e "    },"
 done)
 ]);
 
 player.playlist.autoadvance(0);
 EOF
+  unset random include_dirs
   echo ok
 done
