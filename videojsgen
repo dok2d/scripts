@@ -6,7 +6,7 @@
 #   "include_dirs": true, # Add all videos from nested directories to playlist
 #   "random": true # Sort the playlist randomly
 # }
-#
+
 
 set -e
 
@@ -17,12 +17,12 @@ prefix_url="/ls"  # CHANGEIT OR UNSET
 [ -n "${www_root}" -a ! "${www_root:0-1}" = "/" ] && www_root="${www_root}/"
 [ -n "${prefix_url}" -a ! "${prefix_url:0-1}" = "/" ] && prefix_url="${prefix_url}/"
 
-video_dirs="$(find "$(pwd)" -type f -iregex ".+\.\(${video_formats}\)" -exec dirname "{}" \; | sort -u)"
+video_dirs="$(find "$(pwd)" -type f -iregex ".+\.\(${video_formats}\)" -not -path '*.meta*' -exec dirname "{}" \; | sort -u)"
 
 for dir in $(echo -e "${video_dirs}" | sed 's/ /✖✚/g'); do
   echo -n "$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")..  "
   dir_o="$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")"
-  videos=$(find "${dir_o}" -maxdepth 1 -type f -iregex ".+\.\(${video_formats}\)")
+  videos=$(find "${dir_o}" -maxdepth 1 -type f -iregex ".+\.\(${video_formats}\)" -not -path '*.meta*')
   if [ -f "${dir_o}/.playlist_config.js" ]; then
     for i in random include_dirs; do
       export "${i}"=$(jq -r ".${i}" "${dir_o}/.playlist_config.js")
@@ -31,7 +31,7 @@ for dir in $(echo -e "${video_dirs}" | sed 's/ /✖✚/g'); do
   fi
 
   if [ -n "${include_dirs}" ]; then
-    videos="$(find "${dir_o}" -type f -iregex ".+\.\(${video_formats}\)")"
+    videos="$(find "${dir_o}" -type f -iregex ".+\.\(${video_formats}\)" -not -path '*.meta*')"
   fi
 
   cat << EOF > "${dir_o}/.playlist.js"
@@ -47,15 +47,25 @@ $(for i in $(echo -e "${videos}" | sed 's/ /✖✚/g' | sort ${random:+-R}); do
   [ ! -d "${dir_f}/.meta" ] && mkdir -p "${dir_f}/.meta"
 
   video_duration=$(ffprobe -i "${dir_f}${filename_orig}" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/\..*//g')
-  [ ! -f "${dir_f}.meta/${filename_orig}.png" -a -n "${video_duration}" ] && \
-  ffmpeg -ss $(expr "${video_duration}" / 3 \* 2) -i "${dir_f}${filename//\\/}" -v error -frames:v 1 -filter:v scale="400:-1" "${dir_f}.meta/${filename_orig}.png"
+  [ ! -f "${dir_f}.meta/${filename_orig}.webp" -a -n "${video_duration}" ] && \
+  ffmpeg -ss $(expr "${video_duration}" / 3 \* 2) -i "${dir_f}${filename//\\/}" -v error -frames:v 1 -filter:v scale="400:-1" "${dir_f}.meta/${filename_orig}.webp"
+
+  if [ ! -f "${dir_f}.meta/${filename_orig}.webm" -a -n "${video_duration}" ]; then
+    for i in {02..18}; do
+      ffmpeg -y -ss $(expr "${video_duration}" / 20 \* ${i}) -i "${dir_f}${filename//\\/}" -v error -frames:v 1 -filter:v scale="400:-1" "${dir_f}.meta/${filename_orig}_${i}.png"
+    done
+    ffmpeg -framerate 2 -f image2 -i "${dir_f}.meta/${filename_orig}_%02d.png" -v error -pix_fmt yuva420p "${dir_f}.meta/${filename_orig}.webm"
+    for i in {02..18}; do
+      rm "${dir_f}.meta/${filename_orig}_${i}.png"
+    done
+  fi
 
   echo -e "    {  name: '${filename}',"
   echo -e "       description: '${video_desc}',"
   echo -e "       duration: '${video_duration}',"
-  echo -e "       thumbnail: [{srcset: '${dir_l}.meta/${filename}.png', type: 'image/jpeg', media: '(min-width: 400px;)'}, {src: '${dir_l}.meta/${filename}.png'}],"
+  echo -e "       thumbnail: [{srcset: '${dir_l}.meta/${filename}.webp', type: 'image/webp', media: '(min-width: 400px;)'}, {src: '${dir_l}.meta/${filename}.webp'}],"
   echo -e "       sources: [{src: '${dir_l}${filename}', type: 'video/mp4'}],"
-  echo -e "       poster: '${dir_l}.meta/${filename}.png'"
+  echo -e "       poster: '${dir_l}.meta/${filename}.webp'"
   echo -e "    },"
 done)
 ]);
