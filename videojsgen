@@ -11,8 +11,8 @@
 set -e
 
 video_formats="mp4\|mov\|m4v"
-www_root="/mnt/data/www"  # CHANGEIT OR UNSET
-prefix_url="/ls"  # CHANGEIT OR UNSET
+#www_root=""  # CHANGEIT
+#prefix_url=""  # CHANGEIT
 
 [ -n "${www_root}" -a ! "${www_root:0-1}" = "/" ] && www_root="${www_root}/"
 [ -n "${prefix_url}" -a ! "${prefix_url:0-1}" = "/" ] && prefix_url="${prefix_url}/"
