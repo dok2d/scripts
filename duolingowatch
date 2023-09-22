@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 [ -z "${1}" ] && (echo "User undefined!" && exit 1)
 user="${1}"
 
