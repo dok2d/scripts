@@ -27,7 +27,7 @@ while true; do
     [ -z "$(eval echo -e "\$old_${lang}_${lang_from}")" ] && declare "old_${lang}_${lang_from}"="$(eval echo -e "\$new_${lang}_${lang_from}")"
 
     if [ "$(eval echo -e "\$old_${lang}_${lang_from}")" -ne "$(eval echo -e "\$new_${lang}_${lang_from}")" ]; then
-      tg_text="🔮 *$user_name* втихаря получил $(( "$(eval echo -e "\$new_${lang}_${lang_from}")" - "$(eval echo -e "\$old_${lang}_${lang_from}")" )) за ${lang}(${lang_from})"
+      tg_text="🔮 *$user_name* втихаря получил $(( $(eval echo -e "\$new_${lang}_${lang_from}") - $(eval echo -e "\$old_${lang}_${lang_from}") )) за ${lang}(${lang_from})"
       tg_payload="chat_id=${tg_chat_id}&text=${tg_text}&parse_mode=Markdown&disable_web_page_preview=true"
       curl -s --max-time 10 --retry 5 --retry-delay 2 --retry-max-time 10 -d "${tg_payload}" ${tg_url} > /dev/null 2>&1 &
     fi
