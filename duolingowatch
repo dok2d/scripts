@@ -1,0 +1,41 @@
+#!/bin/bash
+
+[ -z "${1}" ] && (echo "User undefined!" && exit 1)
+user="${1}"
+
+tg_bot_key="XXX:XXX"
+tg_chat_id="-XXX" 
+browser_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.81 Safari/537.36"
+tg_url="https://api.telegram.org/bot${tg_bot_key}/sendMessage"
+
+#
+# .∧＿∧
+# ( ･ω･｡)つ━☆・*。
+# ⊂  ノ    ・゜+.
+# しーＪ   °。+ *´¨)
+#          .· ´¸.·*´¨) ¸.·*¨)
+#           (¸.·´ (¸.·'* ☆ вжух, вжух и в мониторинг
+#
+
+while true; do
+  user_info="$(curl -sA "${browser_agent}" "https://www.duolingo.com/2017-06-30/users?username=${user}")"
+  user_name="$(echo -e "${user_info}" | jq -r '.users[] | .username')"
+
+  while read lang lang_from xp; do 
+    declare "new_${lang}_${lang_from}"="${xp}"
+    [ -z "$(eval echo -e "\$old_${lang}_${lang_from}")" ] && declare "old_${lang}_${lang_from}"="$(eval echo -e "\$new_${lang}_${lang_from}")"
+
+    if [ "$(eval echo -e "\$old_${lang}_${lang_from}")" -ne "$(eval echo -e "\$new_${lang}_${lang_from}")" ]; then
+      tg_text="🔮 *$user_name* втихаря получил $(( "$(eval echo -e "\$new_${lang}_${lang_from}")" - "$(eval echo -e "\$old_${lang}_${lang_from}")" )) за ${lang}(${lang_from})"
+      tg_payload="chat_id=${tg_chat_id}&text=${tg_text}&parse_mode=Markdown&disable_web_page_preview=true"
+      curl -s --max-time 10 --retry 5 --retry-delay 2 --retry-max-time 10 -d "${tg_payload}" ${tg_url} > /dev/null 2>&1 &
+    fi
+
+  done <<< "$(echo -e "${user_info}" | jq -r '.users[] | .courses[] | "\(.learningLanguage) \(.fromLanguage) \(.xp)"')"
+
+## ja en 759
+## en ru 270
+## en ja 0
+
+  sleep $(( 20 + ( RANDOM % 60 )  + ( RANDOM % 10 ) ))
+done
