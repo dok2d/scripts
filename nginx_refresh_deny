@@ -15,8 +15,8 @@ for log in ${access_logs}; do
   [ -n "${log_arch}" ] && zgrep -h " 200 " ${log_arch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_allow
   grep -h " 200 " ${log_notarch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_allow
 
-  [ -n "${log_arch}" ] && zgrep -hv " 200 " ${log_arch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_deny
-  grep -hv " 200 " ${log_notarch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_deny
+  [ -n "${log_arch}" ] && zgrep -hv " 200 \| 206 \| 304 \| 301 \| 412 \|GET /favicon.ico HTTP " ${log_arch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_deny
+  grep -hv --exclude *.gz " 200 \| 206 \| 304 \| 301 \| 412 \|GET /favicon.ico HTTP " ${log_notarch} | sed 's/\ .*//g' | sort -u >> /tmp/nginx_deny
 done
 
 for i in $(cat /tmp/nginx_allow) "^192\.168\." "^10\." "^172\."{16..31}"\."; do
