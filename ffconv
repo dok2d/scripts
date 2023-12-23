@@ -14,9 +14,9 @@
 
 set -e
 
-video_formats="avi mkv ts mov m2v m4v flv mpg mpeg webm wmv m2ts mts"
-audio_formats="mka ac3 mp3 aac"
-subtitle_formats="srt ass"
+video_formats="avi mkv ts mov m2v m4v flv mpg mpeg webm wmv m2ts mp4 mts asf rm ram rmvb 3gp mxf qt vob ogm"
+audio_formats="mka ac3 mp3 aac opus ogg oga sb0"
+subtitle_formats="srt ass mks sub smi idx"
 
 [ "${FFCONV_GPU}"          = yes ] && true
 [ "${FFCONV_SOURCE_SUBS}"  = yes ] && true
