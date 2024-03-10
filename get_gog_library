@@ -1,17 +1,23 @@
 #!/bin/bash
-
 set -e
 
+#### EDIT THIS ####
+platforms=""
+langs_priority=""
+outpath=""
+
+### EXAMPLE
 #platforms="lin win mac" # for get all types of installation
 #langs_priority="deu eng" # If German lang isn't available - get English
 ##Available lang in ISO 639-3: deu eng spa por tur fra ita pol ron fin swe ces rus zho jpn kor
+##
+##Run:bash get_gog_library <cook_file_from_gog.com>
+###################
+
 
 platforms="${platforms:-lin win}"
 langs_priority="${langs_priority:-rus eng}"
 outpath=${outpath:-/var/www}
-
-
-[ "$(dpkg -l | awk '{print $2}' | grep -c "^jq$")" -ne 1 ] && apt-get --yes install jq
 
 function exit_script {
   set +x
@@ -25,13 +31,14 @@ function exit_script {
   [ -n "${err_stat}" -a "${err_stat}" = yes ] && exit 1
 }
 
-[ -f gog_cook ] && cook=$(cat gog_cook) || exit_script err "NULL COOKIE!"
-
 getpage() {
   [ -z "${1}" ] && exit_script err "NULL URL"
-  curl -s -H "${cook}" "$(for i in $*; do echo -n "${i} "; done)"
+  curl -s -H "${cook}" "$(for i in $*; do echo -n "${i} "; done | sed 's/ $//g')"
 }
 
+[ -z "${1}" ] && exit_script err "The cookie file is not specified!"
+[ -f "${1}" ] && cook=$(cat "${1}") || exit_script err "Cookie file not found!"
+[ "$(dpkg -l | awk '{print $2}' | grep -c "^jq$")" -ne 1 ] && apt-get --yes install jq
 totalpages="$(getpage "https://www.gog.com/account/getFilteredProducts?hiddenFlag=0&mediaType=1" | jq -r '.totalPages')"
 
 for i in $(seq 1 ${totalpages}); do
