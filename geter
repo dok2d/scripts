@@ -1,7 +1,11 @@
 #!/bin/bash
 
+decodeURL() {
+   printf "$(sed 's#^file://##;s/+/ /g;s/%\(..\)/\\x\1/g;' <<< "$@")\n";
+}
+
 for url in $(cat links); do
-  filename=$(echo ${url} | sed 's/.*\///;s/%[0-9][0-9]//g')
+  filename=$(decodeURL $(echo ${url} | sed 's/.*\///;s/%[0-9][0-9]//g'))
   #trap "{ rm ${filename}.tmp; exit 0; }" EXIT
   echo -n "${filename}.. "
   [ "$(echo ${filename} | sed 's/^.*\.//g')" = exe -o "$(echo ${filename} | sed 's/^.*\.//g')" = bin ] && filename=win/${filename}
