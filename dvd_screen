@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Set terminal size
+cols=$(tput cols)
+rows=$(tput lines)
+
+# DVD logo dimensions
+logo="DVD"
+logo_length=${#logo}
+
+# Initial position
+x=$((RANDOM % (cols - logo_length)))
+y=$((RANDOM % (rows - 1)))
+
+# Direction
+dx=1
+dy=1
+
+while true; do
+    clear
+    # Print logo at current position
+    for ((i=0; i<y; i++)); do
+        echo
+    done
+    printf "%${x}s%s\n" "" "$logo"
+
+    # Update position
+    x=$((x + dx))
+    y=$((y + dy))
+
+    # Bounce off walls
+    if ((x <= 0 || x >= cols - logo_length)); then
+        dx=$((dx * -1))
+    fi
+    if ((y <= 0 || y >= rows - 1)); then
+        dy=$((dy * -1))
+    fi
+
+    sleep 0.1
+done
