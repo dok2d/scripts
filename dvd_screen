@@ -4,36 +4,35 @@
 cols=$(tput cols)
 rows=$(tput lines)
 
-# DVD logo dimensions
+# Logo settings
 logo="DVD"
-logo_length=${#logo}
-
-# Initial position
-x=$((RANDOM % (cols - logo_length)))
+color=1
+x=$((RANDOM % (cols - 4)))
 y=$((RANDOM % (rows - 1)))
-
-# Direction
 dx=1
 dy=1
 
 while true; do
     clear
-    # Print logo at current position
-    for ((i=0; i<y; i++)); do
-        echo
-    done
-    printf "%${x}s%s\n" "" "$logo"
+
+    # Change color
+    tput setaf $color
+    tput cup $y $x
+    echo -n "$logo"
+    tput sgr0
 
     # Update position
     x=$((x + dx))
     y=$((y + dy))
 
     # Bounce off walls
-    if ((x <= 0 || x >= cols - logo_length)); then
+    if (( x <= 0 || x >= cols - 4 )); then
         dx=$((dx * -1))
+        color=$(( (color + 1) % 8 ))
     fi
-    if ((y <= 0 || y >= rows - 1)); then
+    if (( y <= 0 || y >= rows - 1 )); then
         dy=$((dy * -1))
+        color=$(( (color + 1) % 8 ))
     fi
 
     sleep 0.1
