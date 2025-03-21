@@ -5,7 +5,8 @@ cols=$(tput cols)
 rows=$(tput lines)
 
 # Logo settings
-logo="DVD"
+logo="${1}"
+logo="${1:-DVD}"
 color=1
 x=$((RANDOM % (cols - 4)))
 y=$((RANDOM % (rows - 1)))
@@ -35,5 +36,5 @@ while true; do
         color=$(( (color + 1) % 8 ))
     fi
 
-    sleep 0.1
+    sleep 0.08
 done
