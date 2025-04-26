@@ -2,7 +2,7 @@
 # Generating playlists of audio files in nested directories for webamp (webamp.org)
 set -e
 
-audio_formats="mp3\|wav\|flac\|m4a"
+audio_formats="mp3\|wav\|flac\|m4a\|webm"
 
 track_dirs="$(find "$(pwd)" -type f -iregex ".+\.\(${audio_formats}\)" -exec dirname "{}" \; | sort -u)"
 
@@ -10,29 +10,74 @@ for dir in $(echo -e "${track_dirs}" | sed 's/ /✖✚/g'); do
   echo -n "$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")..  "
   dir_o="$(realpath "$(echo ${dir} | sed 's/✖✚/ /g')")"
   tracks=$(find "${dir_o}" -maxdepth 1 -type f -iregex ".+\.\(${audio_formats}\)" -exec basename {} \;)
-  cat << EOF > "${dir_o}/.webamp.js"
+  
+  # Check if .webamp.js exists and extract existing tracks
+  existing_tracks=()
+  if [ -f "${dir_o}/.webamp.js" ]; then
+    existing_tracks=($(grep -oP 'url: "\K[^"]+' "${dir_o}/.webamp.js"))
+  fi
+  
+  # Generate new tracks array, skipping existing ones
+  new_tracks=()
+  for i in $(echo -e "${tracks}" | sed 's/ /✖✚/g' | sort); do
+    track_file="$(echo ${i} | sed 's/✖✚/ /g')"
+    if [[ ! " ${existing_tracks[@]} " =~ " ${track_file} " ]]; then
+      new_tracks+=("$i")
+    fi
+  done
+  
+  # If no new tracks and file exists, skip regeneration
+  if [ ${#new_tracks[@]} -eq 0 ] && [ -f "${dir_o}/.webamp.js" ]; then
+    echo "no new tracks"
+    continue
+  fi
+  
+  # Generate the new content
+  if [ -f "${dir_o}/.webamp.js" ]; then
+    # Remove the last lines to prepare for appending new tracks
+    grep -v "^],\|^});\|^//\|^webamp.renderWhenReady" "${dir_o}/.webamp.js" > "${dir_o}/.webamp.js.tmp"
+    mv "${dir_o}/.webamp.js.tmp" "${dir_o}/.webamp.js"
+    # Add comma if there are existing tracks
+    if [ ${#existing_tracks[@]} -gt 0 ]; then
+      echo "," >> "${dir_o}/.webamp.js"
+    fi
+  else
+    cat << EOF > "${dir_o}/.webamp.js"
 const Webamp = window.Webamp;
 const webamp = new Webamp({
 enableHotkeys: true,
 initialTracks: [
-$(for i in $(echo -e "${tracks}" | sed 's/ /✖✚/g' | sort); do
-  track_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
-  track_artist=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
-  track_title=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
+EOF
+  fi
 
-  [ -z "${track_artist}" ] && track_artist=$(echo ${i} | sed 's/✖✚/ /g')
-  [ -z "${track_title}" ]  && track_title=" "
+  # Append new tracks
+  for i in "${new_tracks[@]}"; do
+    track_duration=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 | head -n1)
+    track_artist=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
+    track_title=$(ffprobe -i "${dir_o}/$(echo ${i} | sed 's/✖✚/ /g')" -v error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 | head -n1 | sed 's/"//g')
 
-  echo -e "  {"
-  [ -n "${track_artist}" -o -n "${track_title}" ] && \
-  echo -e "    metaData: {\n      ${track_artist:+artist: \"}${track_artist}${track_artist:+\",}\n      ${track_title:+title: \"}${track_title}${track_title:+\"}},"
-  echo -e "    url: \"$(echo ${i} | sed 's/✖✚/ /g')\",\n    duration: ${track_duration}\n  },"
-  unset track_duration track_artist track_title
-done)
+    [ -z "${track_artist}" ] && track_artist=$(echo ${i} | sed 's/✖✚/ /g')
+    [ -z "${track_title}" ]  && track_title=" "
+
+    echo -e "  {" >> "${dir_o}/.webamp.js"
+    [ -n "${track_artist}" -o -n "${track_title}" ] && \
+    echo -e "    metaData: {\n      ${track_artist:+artist: \"}${track_artist}${track_artist:+\",}\n      ${track_title:+title: \"}${track_title}${track_title:+\"}}," >> "${dir_o}/.webamp.js"
+    echo -e "    url: \"$(echo ${i} | sed 's/✖✚/ /g')\",\n    duration: ${track_duration}\n  }," >> "${dir_o}/.webamp.js"
+    unset track_duration track_artist track_title
+  done
+
+  # Remove the last comma if it exists
+  if [ -f "${dir_o}/.webamp.js" ]; then
+    sed -i '$ s/,$//' "${dir_o}/.webamp.js"
+  fi
+
+  # Close the array and object
+  cat << EOF >> "${dir_o}/.webamp.js"
 ],
 });
 // Returns a promise indicating when it's done loading.
 webamp.renderWhenReady(document.getElementById('app'));
 EOF
-  echo ok
+
+  echo "added ${#new_tracks[@]} new tracks"
 done
