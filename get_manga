@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+current_directory=$(pwd)
+
+[ -z "${1}" ] && exit 1
+
+char_location="$(curl -skL -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0' "${1}" | awk -F '"' '/read-first-chapter/ {print $2}')"
+domain=$(echo "${1}" | sed -E 's|https?://||; s|/.*||')
+
+title_dir="${current_directory}$(dirname ${char_location})"
+mkdir -p "${title_dir}"
+echo "${1}" >> "${title_dir}/link.txt"
+
+while true; do
+  char_location="${char_location%\?*}"
+  [ "$(basename ${char_location})" = finish -o -z "$(basename ${char_location})" ] && false
+  echo -e "\n${char_location}"
+  out_dir="${current_directory}${char_location}"
+  mkdir -p "${out_dir}"
+
+  for i in $(curl -skL -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0' "https://${domain}${char_location}?mtr=true" | grep readerInit | sed "s/.*(\[//g;s/\],\[/ /g;s/^\[//g;s/, false, \[.*);//g;s/\]\]$//g"); do
+    pic_link="$(echo ${i} | sed "s/','',\"//g;s/\",.*//g;s/^'//g;s/?.*//g")"
+    pic_name=$(basename ${pic_link})
+    echo -ne "${pic_name%\?*}.. "
+    [ -f "${out_dir}/${pic_name%\?*}" ] && echo -n "already " || wget -qcO "${out_dir}/${pic_name%\?*}" "${pic_link}"
+    [ "$?" = 0 ] && echo ok || echo not ok
+  done
+
+  char_location=$(curl -skL -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0' "https://${domain}${char_location}?mtr=true" | awk -F '"' '/nextChapterLink/ {print $2}')
+done
