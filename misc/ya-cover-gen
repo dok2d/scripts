@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "Использование: $0 'ТЕКСТ'"
+  exit 1
+fi
+
+TEXT="$1"
+OUTPUT="output.png"
+FONT="Montserrat-Black"
+SIZE="1000x1000"
+BG_COLOR="black"
+TEXT_COLOR="#ffd800"
+BORDER_COLOR="red"
+FONT_SIZE="250"
+
+convert -size $SIZE canvas:$BG_COLOR \
+  -fill $TEXT_COLOR -font $FONT -pointsize $FONT_SIZE -gravity center -annotate +0+0 "$TEXT" \
+  -bordercolor $BORDER_COLOR -border 30x30 $OUTPUT
+
+echo "Изображение создано: $OUTPUT"
