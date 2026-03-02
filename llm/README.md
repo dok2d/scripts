@@ -6,44 +6,186 @@
 
 ### `dir2prompt.py`
 
-**Назначение:** Конвертация директории с файлами в JSON-формат и обратно для удобной передачи в контекст LLM.
+Утилита для упаковки директории с файлами в один файл и передачи его в LLM. Поддерживает XML и JSON форматы, outline-режим для экономии токенов, бинарные файлы через base64 и инкрементальный diff.
 
-**Описание:**
-Скрипт позволяет "упаковать" содержимое директории (только текстовые файлы, кодировка UTF-8) в единый JSON-файл, который можно отправить в запросе к LLM. Также поддерживается обратная операция — восстановление файлов из JSON.
+## Требования
 
-**Возможности:**
-- Автоматическое определение текстовых файлов (бинарные помечаются как `binaryfile`)
-- Игнорирование скрытых файлов/папок (можно включить флагом)
-- При восстановлении — проверка на перезапись с запросом подтверждения
+Python 3.9+ (используется `ast.unparse`). Зависимостей нет — только stdlib.
 
-**Режимы работы:**
+## Команды
 
-**archive** — создание JSON из директории:
+### `archive` — упаковать директорию
+
+```
+dir2prompt.py archive <source_dir> <output_file> [опции]
+```
+
+Собирает все текстовые файлы из директории в один XML или JSON файл. Бинарные файлы по умолчанию пропускаются (`⬜`).
+
 ```bash
-./dir2prompt.py archive /path/to/dir output.json
-./dir2prompt.py archive /path/to/dir output.json --hidden  # включить скрытые файлы
+# Базовое использование
+dir2prompt.py archive ./src out.xml
+
+# С фокусом на ключевых файлах, стрипом и исключениями
+dir2prompt.py archive ./src out.xml \
+    --focus 'models\.py$' \
+    --focus '^src/core/' \
+    --strip \
+    -e '\.lock$' \
+    -e '^node_modules/' \
+    -e '^dist/'
+
+# JSON формат с бинарными файлами
+dir2prompt.py archive ./assets out.json --format json --binary
 ```
 
-**extract** — восстановление файлов из JSON:
+**Опции:**
+
+| Флаг | Кратко | Описание |
+|------|--------|----------|
+| `--format {xml,json}` | `-f` | Формат вывода (по умолчанию: `xml`) |
+| `--focus REGEX` | | Focus-файлы идут первыми с полным контентом, остальные — в виде outline. Повторяемый флаг |
+| `--strip` | `-s` | Убрать trailing whitespace и схлопнуть 3+ пустых строки в 2 |
+| `--binary` | `-b` | Включить бинарные файлы в архив (кодируются в base64) |
+| `--exclude REGEX` | `-e` | Исключить файлы по регулярке. Повторяемый флаг |
+| `--hidden` | `-H` | Включить скрытые файлы и папки (начинающиеся с `.`) |
+| `--yes` | `-y` | Не запрашивать подтверждение |
+
+### `extract` — восстановить файлы
+
+```
+dir2prompt.py extract <archive_file> <target_dir> [опции]
+```
+
+Разворачивает архив обратно в файловую систему. Всегда восстанавливает полный оригинальный контент — независимо от того, с каким `--focus` создавался архив. Бинарные файлы (base64) декодируются байт-в-байт.
+
 ```bash
-./dir2prompt.py extract output.json /path/to/restore
-./dir2prompt.py extract output.json /path/to/restore --yes   # авто-перезапись
-./dir2prompt.py extract output.json /path/to/restore --hidden  # восстанавливать скрытые
+dir2prompt.py extract out.xml ./restored
+dir2prompt.py extract out.xml ./restored --yes -e '\.pyc$'
 ```
 
-**Пример JSON на выходе:**
-```json
-{
-  "script.sh": {
-    "content": "#!/bin/bash\necho 'Hello'"
-  },
-  "image.png": {
-    "content": "binaryfile"
-  }
-}
+**Опции:** `--exclude`, `--hidden`, `--yes`
+
+### `diff` — инкрементальный архив изменений
+
+```
+dir2prompt.py diff <source_dir> <baseline_file> <output_file> [опции]
 ```
 
----
+Сравнивает текущее состояние директории с ранее созданным архивом и сохраняет только новые и изменённые файлы. Удалённые файлы перечисляются в мета-записи `__deleted__`.
+
+```bash
+# Создать baseline
+dir2prompt.py archive ./src baseline.xml -y
+
+# ... поработали, изменили файлы ...
+
+# Отправить в LLM только изменения
+dir2prompt.py diff ./src baseline.xml delta.xml
+```
+
+Флаг `--focus` в `diff` отсутствует намеренно: сравнение всегда ведётся по полному контенту, порядок файлов в baseline не имеет значения.
+
+> ⚠️  Если при `archive` использовался `--strip`, указывай его и в `diff` — иначе контент будет отличаться и все файлы окажутся «изменёнными».
+
+**Опции:** `--format`, `--strip`, `--binary`, `--exclude`, `--hidden`, `--yes`
+
+### `estimate` — оценка токенов без сохранения
+
+```
+dir2prompt.py estimate <source_dir> [опции]
+```
+
+Показывает структуру файлов и приблизительное количество токенов (1 токен ≈ 4 символа) для XML и JSON форматов. Полезно перед `archive`, чтобы подобрать флаги и вписаться в контекстное окно.
+
+```bash
+# Оценить без оптимизаций
+dir2prompt.py estimate ./src
+
+# Смоделировать экономию от --focus и --strip
+dir2prompt.py estimate ./src --focus 'core\.py$' --strip -e '^tests/'
+```
+
+**Опции:** `--focus`, `--strip`, `--binary`, `--exclude`, `--hidden`
+
+## Форматы архива
+
+По умолчанию используется XML — он компактнее и лучше воспринимается LLM. Текстовый контент хранится в CDATA-секциях, бинарный — inline base64.
+
+```xml
+<files>
+  <file path="src/main.py" encoding="utf-8"><![CDATA[
+def main():
+    pass
+]]></file>
+  <file path="assets/logo.png" encoding="base64">iVBORw0KGgo...</file>
+  <file path="build/" encoding="excluded"/>
+</files>
+```
+
+Формат файла при `extract` определяется автоматически по расширению (`.xml` / `.json`) или по первому символу содержимого.
+
+## Outline-режим
+
+При использовании `--focus` файлы делятся на два класса:
+
+**Focus-файлы** (совпадают с паттерном) — полный контент, размещаются первыми в архиве.
+
+**Остальные** — заменяются структурным outline:
+
+- `.py` — AST-разбор: классы с сигнатурами методов (включая аннотации типов и дефолты), модульные константы `ALL_CAPS`
+- Все остальные форматы — первые 30 строк файла
+
+```
+# OUTLINE: src/services/user.py (120 lines)
+MAX_BATCH = ...
+
+class UserService(BaseService):
+    def __init__(self, db: Database, cache: Redis) -> None: ...
+    def get(self, user_id: int) -> User | None: ...
+    async def create(self, *, name: str, email: str) -> User: ...
+```
+
+Outline **не сохраняется в архив** — файл всегда содержит полный контент. Outline применяется только при выводе на экран и при передаче LLM. Это позволяет корректно работать `extract` и `diff` без указания тех же `--focus`-паттернов.
+
+## Иконки в выводе
+
+| Иконка | Значение |
+|--------|----------|
+| 📄 | Текстовый файл, полный контент |
+| 📋 | Outline (только при `--focus`) |
+| 🔷 | Бинарный файл, закодирован в base64 |
+| ⬜ | Бинарный файл, пропущен |
+| 🚫 | Исключён через `--exclude` |
+
+## Типичные сценарии
+
+**Передать проект в LLM целиком:**
+```bash
+dir2prompt.py archive ./myproject prompt.xml \
+    -e '\.pyc$' -e '__pycache__' -e '\.git' -e 'node_modules'
+```
+
+**Работать с большим проектом итеративно:**
+```bash
+# Первый сеанс — весь проект, ключевые файлы в фокусе
+dir2prompt.py archive ./src session1.xml \
+    --focus 'models\.py$' --focus 'api\.py$' --strip -y
+
+# Второй сеанс — только что изменилось
+dir2prompt.py diff ./src session1.xml session2.xml -y
+```
+
+**Оценить, влезет ли проект в контекст:**
+```bash
+dir2prompt.py estimate ./src --focus '^src/core' --strip
+# → XML: 48 230 байт (~12 057 токенов)
+```
+
+**Восстановить файлы из ответа LLM:**
+```bash
+dir2prompt.py extract llm_response.xml ./output --yes
+```
 
 ### `convert-tg-chats.py`
 
