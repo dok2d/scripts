@@ -296,12 +296,12 @@ def check_url(url: str, timeout: int = 10) -> tuple[str, bool, str]:
     Проверяет доступность URL.
     Возвращает (url, is_alive, reason).
     """
+    # Пропускаем внутренние URL Firefox
+    if url and url.startswith(("about:", "chrome://", "file://", "place:", "javascript:")):
+        return url, True, "внутренний URL"
+
     if not url or not url.startswith(("http://", "https://")):
         return url, False, "не HTTP(S)"
-
-    # Пропускаем внутренние URL Firefox
-    if url.startswith(("about:", "chrome://", "file://", "place:", "javascript:")):
-        return url, True, "внутренний URL"
 
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
@@ -441,7 +441,6 @@ def cmd_check_alive(args):
 
     dead_urls = set()
     alive_count = 0
-    skipped_count = 0
     checked = 0
 
     unique_urls = {}
@@ -477,7 +476,7 @@ def cmd_check_alive(args):
                 if not is_alive:
                     print(f"  [{checked}/{len(unique_list)} {pct:.0f}%] {status} {reason:30s} {title}")
                 else:
-                    print(f"  [{checked}/{len(unique_list)} {pct:.0f}%] проверено...", end="\r")
+                    print(f"  [{checked}/{len(unique_list)} {pct:.0f}%] проверено...", end="\r", flush=True)
 
     print(f"\n{'=' * 60}")
     print(f"Результаты:")
