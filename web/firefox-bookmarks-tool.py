@@ -450,6 +450,7 @@ def cmd_check_alive(args):
     unique_list = list(unique_urls.keys())
 
     print(f"Уникальных URL: {len(unique_list)}")
+    print(f"Проверка запущена, таймаут на каждый URL до {args.timeout} сек...")
     print()
 
     with ThreadPoolExecutor(max_workers=args.threads) as executor:
@@ -464,19 +465,15 @@ def cmd_check_alive(args):
 
             if is_alive:
                 alive_count += 1
-                status = "✓"
             else:
                 dead_urls.add(url)
-                status = "✗"
 
-            # Прогресс
-            if checked % 10 == 0 or not is_alive:
-                pct = checked / len(unique_list) * 100
-                title = unique_urls[url].get("title", "")[:40]
-                if not is_alive:
-                    print(f"  [{checked}/{len(unique_list)} {pct:.0f}%] {status} {reason:30s} {title}")
-                else:
-                    print(f"  [{checked}/{len(unique_list)} {pct:.0f}%] проверено...", end="\r", flush=True)
+            pct = checked / len(unique_list) * 100
+            title = unique_urls[url].get("title", "")[:40]
+            if not is_alive:
+                print(f"  [{checked}/{len(unique_list)} {pct:.0f}%] ✗ {reason:30s} {title}")
+            else:
+                print(f"  [{checked}/{len(unique_list)} {pct:.0f}%] проверено...", end="\r", flush=True)
 
     print(f"\n{'=' * 60}")
     print(f"Результаты:")
